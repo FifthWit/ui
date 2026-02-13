@@ -1,0 +1,20 @@
+import { GhCardDemo } from "@/registry/demos/github-hover-card";
+
+const previews: Record<string, React.ComponentType> = {
+	"gh-card": GhCardDemo,
+};
+export function ComponentPreview({ name }: { name: string }) {
+	const Preview = previews[name];
+	if (!Preview) return <div>Preview not found: {name}</div>;
+
+	return (
+		<div className="my-4 not-prose">
+			{" "}
+			<div className="rounded-lg flex items-center justify-center">
+				<div className="[&_a]:no-underline **:no-underline">
+					<Preview />
+				</div>
+			</div>
+		</div>
+	);
+}

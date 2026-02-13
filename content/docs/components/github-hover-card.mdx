@@ -1,0 +1,109 @@
+---
+title: GitHub Hover Card
+description: Card with smooth hover effect from GitHub's homepage
+---
+
+import { ComponentPreview } from '@/components/component-preview';
+
+<Tabs items={['Preview', 'Code']}>
+    <Tab><ComponentPreview name="gh-card" /></Tab>
+    <Tab>
+    ```tsx
+import {
+	GhCardImage,
+	GhCardRoot,
+	GhCardTitle,
+	GhCardLabel,
+	GhCardHeader,
+	GhCardSubHeader,
+	GhCardContent,
+} from "@/registry/components/github-hover-card";
+
+const imageUrl =
+	"https://i.scdn.co/image/ab67616d0000b2736c7112082b63beefffe40151";
+
+export function GhCardDemo() {
+	return (
+		<GhCardRoot href="https://github.com/FifthWit/ui">
+			<GhCardImage
+				blur="30px"
+				alt="Blurred Mountain"
+				src={imageUrl}
+				darken={0.3}
+			/>
+			<GhCardTitle>Figma</GhCardTitle>
+			<GhCardContent>
+				<GhCardLabel>Design Corp</GhCardLabel>
+				<GhCardHeader>
+					Figma gains 100x users after mandating anime girlfriends for all users
+				</GhCardHeader>
+				<GhCardSubHeader>Read More</GhCardSubHeader>
+			</GhCardContent>
+		</GhCardRoot>
+	);
+}
+
+    ```
+    </Tab>
+</Tabs>
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'deno', 'bun']}>
+    <Tab>
+```bash
+npx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/gh-hover-card.json
+```
+    </Tab>
+    <Tab>
+```bash
+pnpm dlx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/gh-hover-card.json
+```
+    </Tab>
+    <Tab>
+```bash
+deno run -A npm:shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/gh-hover-card.json
+```
+    </Tab>
+    <Tab>
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/gh-hover-card.json
+```
+    </Tab>
+</Tabs>
+
+## Usage
+```tsx
+import {
+	GhCardImage,
+	GhCardRoot,
+	GhCardTitle,
+	GhCardLabel,
+	GhCardHeader,
+	GhCardSubHeader,
+	GhCardContent,
+} from "@//components/github-hover-card";
+```
+
+```tsx
+export function GithubCardDemo() {
+	return (
+		<GhCardRoot href="https://example.com">
+			<GhCardImage
+				blur="30px"
+				alt="Description"
+				src="https://example.com/image.png"
+				darken={0.3}
+			/>
+			<GhCardTitle>Hover Me</GhCardTitle>
+			<GhCardContent>
+				<GhCardLabel>Design Corp</GhCardLabel>
+				<GhCardHeader>
+					Figma gains 100x users after mandating anime girlfriends for all users
+				</GhCardHeader>
+				<GhCardSubHeader>Read More</GhCardSubHeader>
+			</GhCardContent>
+		</GhCardRoot>
+	);
+}
+```

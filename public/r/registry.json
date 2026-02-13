@@ -1,0 +1,22 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry.json",
+	"name": "fifth-ui",
+	"homepage": "ui.fifthwit.net",
+	"items": [
+		{
+			"name": "gh-hover-card",
+			"type": "registry:component",
+			"title": "Github Hover Card",
+			"description": "A card with a smooth hover effect design from the GitHub website",
+			"dependencies": ["", ""],
+			"registryDependencies": [""],
+			"files": [
+				{
+					"path": "registry/components/github-hover-card.tsx",
+					"type": "registry:component",
+					"target": "components/github-hover-card.tsx"
+				}
+			]
+		}
+	]
+}
