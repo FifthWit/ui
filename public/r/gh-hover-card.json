@@ -3,13 +3,8 @@
   "name": "gh-hover-card",
   "title": "Github Hover Card",
   "description": "A card with a smooth hover effect design from the GitHub website",
-  "dependencies": [
-    "",
-    ""
-  ],
-  "registryDependencies": [
-    ""
-  ],
+  "dependencies": [],
+  "registryDependencies": [],
   "files": [
     {
       "path": "registry/components/github-hover-card.tsx",
