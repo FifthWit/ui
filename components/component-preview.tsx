@@ -1,7 +1,9 @@
 import { GhCardDemo } from "@/registry/demos/github-hover-card";
+import { SlidingMenuDemo } from "@/registry/demos/sliding-menu"
 
 const previews: Record<string, React.ComponentType> = {
 	"gh-card": GhCardDemo,
+	"sliding-menu": SlidingMenuDemo
 };
 export function ComponentPreview({ name }: { name: string }) {
 	const Preview = previews[name];

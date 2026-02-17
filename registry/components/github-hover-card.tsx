@@ -2,7 +2,6 @@ import React, {
 	createContext,
 	useContext,
 	forwardRef,
-	HtmlHTMLAttributes,
 } from "react";
 import { cn } from "@/lib/utils";
 
