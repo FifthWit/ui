@@ -3,10 +3,12 @@
 import { useParams } from "next/navigation";
 import { GhCardDemo } from "@/registry/demos/github-hover-card";
 import { SlidingMenuDemo } from "@/registry/demos/sliding-menu";
+import { StatefulBadgeDemo } from "@/registry/demos/stateful-badge";
 
 const demos: Record<string, React.ComponentType> = {
 	"sliding-menu": SlidingMenuDemo,
 	"github-hover-card": GhCardDemo,
+	"stateful-badge": StatefulBadgeDemo,
 };
 
 export default function DemoPage() {
