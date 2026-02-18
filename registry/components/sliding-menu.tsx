@@ -106,11 +106,12 @@ function SlidingMenuPortal({
 function SlidingMenuContent({
 	className,
 	children,
+	sideOffset = 8,
 	...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
 	return (
 		<PopoverPrimitive.Content
-			sideOffset={8}
+			sideOffset={sideOffset}
 			className={cn(
 				"bg-popover w-56 h-60 rounded-xl p-0 overflow-hidden shadow-md border",
 				"data-[state=open]:animate-in data-[state=closed]:animate-out",

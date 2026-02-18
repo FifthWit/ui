@@ -4,6 +4,7 @@ description: Popover menu that can have nested subsections via a sliding animati
 ---
 
 import { ComponentPreview } from "@/components/component-preview";
+import { TypeTable } from 'fumadocs-ui/components/type-table';
 
 <Tabs items={["Preview", "Code"]}>
   <Tab>
@@ -22,19 +23,19 @@ import {
 } from "@/components/sliding-menu";
 
 import {
-  BankIcon,
-  CaretRightIcon,
-  CodeIcon,
-  CreditCardIcon,
-  DownloadSimpleIcon,
-  GearIcon,
-  GithubLogoIcon,
-  HandPalmIcon,
-  ProhibitIcon,
-  SignOutIcon,
-  UserGearIcon,
-  UserListIcon,
-  UsersThreeIcon,
+    BankIcon,
+    CaretRightIcon,
+    CodeIcon,
+    CreditCardIcon,
+    DownloadSimpleIcon,
+    GearIcon,
+    GithubLogoIcon,
+    HandPalmIcon,
+    ProhibitIcon,
+    SignOutIcon,
+    UserGearIcon,
+    UserListIcon,
+    UsersThreeIcon,
 } from "@phosphor-icons/react";
 
 export function SlidingMenuDemo() {
@@ -128,3 +129,159 @@ export function SlidingMenuDemo() {
     ```
   </Tab>
 </Tabs>
+
+## Anatomy
+Import all parts and use them together
+
+```tsx
+import {
+	SlidingMenu,
+	SlidingMenuTrigger,
+	SlidingMenuContent,
+	SlidingMenuPortal,
+	SlidingMenuPage,
+	SlidingMenuItem,
+	SlidingMenuSeperator,
+} from "@/components/sliding-menu";
+```
+```tsx
+<SlidingMenu>
+  <SlidingMenuTrigger></SlidingMenuTrigger>
+  <SlidingMenuPortal>
+    <SlidingMenuContent>
+      <SlidingMenuItem>
+        <SlidingMenuSeperator />
+      </SlidingMenuItem>
+    </SlidingMenuContent>
+  </SlidingMenuPortal>
+</SlidingMenu>
+```
+
+## API Reference
+
+### SlidingMenu
+Root container for all other items in the SlidingMenu
+<TypeTable
+  type={{
+    onPageChange: {
+      description: 'Function ran when the selected page changes',
+      type: 'function',
+      required: false,
+      default: `undefined`,
+    },
+    Primitives: {
+      description: 'All default props from the Radix Primitive <Popover.Root /> Apply',
+    }
+  }}
+/>
+
+### SlidingMenuTrigger
+<TypeTable
+  type={{
+    Primitives: {
+      description: 'All default props from the Radix Primitive <Popover.Trigger /> Apply',
+    }
+  }}
+/>
+
+### SlidingMenuPortal
+<TypeTable
+  type={{
+    Primitives: {
+      description: 'All default props from the Radix Primitive <Popover.Portal /> Apply',
+    }
+  }}
+/>
+
+### SlidingMenuContent
+<TypeTable
+  type={{
+    children: {
+      required: true,
+      type: "React.ReactNode"
+    },
+    sideOffset: {
+      type: "number",
+      required: false,
+      default: "8",
+      description: "The distance in pixels from the trigger"
+    },
+    Primitives: {
+      description: 'All default props from the Radix Primitive <Popover.Content /> Apply',
+    }
+  }}
+/>
+
+### SlidingMenuPage
+<TypeTable
+  type={{
+    pageId: {
+      required: true,
+      type: "string",
+      description: 'Unique id that can be referenced to navigate to the page'
+    },
+    children: {
+      required: true,
+      type: "React.ReactNode"
+    }
+  }}
+/>
+
+### SlidingMenuItem
+<TypeTable
+  type={{
+    children: {
+      required: true,
+      type: "React.ReactNode"
+    },
+    navigateToPage: {
+      type: "string",
+      required: false,
+      description: "Page ID to navigate to when clicked"
+    },
+    onSelect: {
+      type: "function",
+      required: false,
+      description: "Callback function when item is selected"
+    },
+    variant: {
+      type: '"default" | "destructive"',
+      required: false,
+      default: '"default"',
+      description: "Visual variant of the menu item"
+    },
+    disabled: {
+      type: "boolean",
+      required: false,
+      default: "false",
+      description: "Whether the item is disabled"
+    }
+  }}
+/>
+
+### SlidingMenuSeperator
+A visual separator between menu items
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      required: false,
+      description: "Additional CSS classes"
+    }
+  }}
+/>
+
+### useSlidingMenu
+Hook to access the sliding menu context. Must be used within a `SlidingMenu` component.
+
+Returns:
+```tsx
+{
+  currentPage: string;
+  navigateToPage: (pageId: string) => void;
+  navigateBack: () => void;
+  pageHistory: string[];
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+}
+```
