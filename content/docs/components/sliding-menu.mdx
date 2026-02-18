@@ -196,6 +196,11 @@ Root container for all other items in the SlidingMenu
 ### SlidingMenuContent
 <TypeTable
   type={{
+    side: {
+      description: "The side that the menu opens to",
+      type: "top | right | bottom | left",
+      default: "bottom"
+    },
     children: {
       required: true,
       type: "React.ReactNode"
