@@ -32,6 +32,21 @@
 					"target": "components/sliding-menu.tsx"
 				}
 			]
+		},
+		{
+			"name": "stateful-badge",
+			"type": "registry:component",
+			"title": "Stateful Badge",
+			"description": "A Badge that animates when it's state is changed",
+			"dependencies": ["motion"],
+			"registryDependencies": [],
+			"files": [
+				{
+					"path": "registry/components/stateful-badge.tsx",
+					"type": "registry:component",
+					"target": "components/stateful-badge.tsx"
+				}
+			]
 		}
 	]
 }

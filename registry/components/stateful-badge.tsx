@@ -1,20 +1,11 @@
-import React, {
-	ComponentPropsWithRef,
-	forwardRef,
-	Ref,
-	useImperativeHandle,
-	useRef,
-} from "react";
+"use client";
+
+import React, { type Ref, useImperativeHandle } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CheckIcon } from "lucide-react";
-import {
-	CheckFatIcon,
-	MinusIcon,
-	WarningIcon,
-	XIcon,
-} from "@phosphor-icons/react";
+import { MinusIcon, WarningIcon, XIcon } from "@phosphor-icons/react";
 
-type stateTypes = "idle" | "error" | "success" | "warning";
+export type stateTypes = "idle" | "error" | "success" | "warning" | "loading";
 
 export interface StatefulBadgeHandle {
 	updateState: (newState: stateTypes) => void;
@@ -27,14 +18,12 @@ interface StatefulBadgeProps {
 
 export function StatefulBadge({ initialState, ref }: StatefulBadgeProps) {
 	const [badgeState, setBadgeState] = React.useState<stateTypes>(initialState);
-	const badgeRef = useRef(null);
 
 	useImperativeHandle(ref, () => ({
 		updateState(newState: stateTypes) {
 			setBadgeState(newState);
 		},
 	}));
-
 	const badgeStyles: {
 		type: stateTypes;
 		className: string;
@@ -43,13 +32,36 @@ export function StatefulBadge({ initialState, ref }: StatefulBadgeProps) {
 		{
 			type: "idle",
 			className:
-				"bg-primary/10 w-full aspect-square rounded-full flex items-center justify-center",
+				"bg-muted w-full aspect-square rounded-full flex items-center justify-center",
 			icon: (
 				<MinusIcon
 					size={128}
 					weight="bold"
 					className="mt-1 ml-1 text-background/85"
 				/>
+			),
+		},
+		{
+			type: "loading",
+			className:
+				"bg-muted w-full aspect-square rounded-full flex flex-row gap-1 items-center justify-center",
+			icon: (
+				<>
+					{[0, 1 / 5, 2 / 5, 3 / 5, 4 / 5].map((delay) => (
+						<motion.div
+							key={`indicator-${delay}`}
+							className="w-4 h-4 rounded-full bg-background/85"
+							animate={{ height: [16, 40, 16], opacity: [0.8, 1, 0.8] }}
+							transition={{
+								duration: 0.5,
+								repeat: Infinity,
+								ease: "easeOut",
+								delay: delay / 1.5,
+								repeatDelay: 0.4,
+							}}
+						/>
+					))}
+				</>
 			),
 		},
 		{
@@ -81,9 +93,9 @@ export function StatefulBadge({ initialState, ref }: StatefulBadgeProps) {
 						<motion.div
 							key={style.type}
 							className={style.className}
-							initial={{ scale: 0.6, opacity: 0, filter: 'blur(10px)' }}
-							animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
-							exit={{ scale: 0.6, opacity: 0, filter: 'blur(10px)' }}
+							initial={{ scale: 0.6, opacity: 0, filter: "blur(10px)" }}
+							animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+							exit={{ scale: 0.6, opacity: 0, filter: "blur(10px)" }}
 							transition={{
 								type: "spring",
 								stiffness: 500,

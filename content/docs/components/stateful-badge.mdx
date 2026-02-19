@@ -1,0 +1,145 @@
+---
+title: Stateful Badge
+description: An animated badge component that transitions smoothly between different states.
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+<Tabs items={["Preview", "Code"]}>
+  <Tab>
+    <ComponentPreview name="stateful-badge" />
+  </Tab>
+  <Tab>
+  ```tsx
+import { useRef, useState } from "react";
+import {
+    StatefulBadge,
+    type StatefulBadgeHandle,
+    type stateTypes,
+} from "@/components/stateful-badge";
+
+export function StatefulBadgeDemo() {
+    const badgeRef = useRef<StatefulBadgeHandle>(null);
+    const [currentState, setCurrentState] = useState<stateTypes>("idle");
+
+    const handleUpdateState = (state: typeof currentState) => {
+        badgeRef.current?.updateState(state);
+        setCurrentState(state);
+    };
+
+    return (
+        <div className="flex flex-col items-center">
+            <StatefulBadge initialState="idle" ref={badgeRef} />
+            <div className="flex flex-row border rounded-xl p-1">
+                {(["idle", "loading", "error", "success", "warning"] as const).map(
+                    (state) => (
+                        <button
+                            data-enabled={currentState === state}
+                            key={state}
+                            type="button"
+                            className="bg-secondary border text-secondary-foreground p-2 m-1 rounded-lg data-[enabled=true]:hover:cursor-not-allowed data-[enabled=true]:bg-primary data-[enabled=true]:text-primary-foreground hover:cursor-pointer transition-all duration-100 ease-out active:scale-94"
+                            onClick={() => handleUpdateState(state)}
+                        >
+                            {state.charAt(0).toUpperCase() + state.slice(1)}
+                        </button>
+                    ),
+                )}
+            </div>
+        </div>
+    );
+}
+```
+  </Tab>
+</Tabs>
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "Deno", "Bun"]}>
+  <Tab>
+    ```bash
+    npx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/stateful-badge.json
+    ```
+  </Tab>
+  <Tab>
+    ```bash
+    pnpm dlx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/stateful-badge.json
+    ```
+  </Tab>
+  <Tab>
+    ```bash
+    deno run -A npm:shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/stateful-badge.json
+    ```
+  </Tab>
+  <Tab>
+    ```bash
+    bunx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/stateful-badge.json
+    ```
+  </Tab>
+</Tabs>
+
+## Usage
+
+```tsx
+import { useRef } from "react";
+import {
+    StatefulBadge,
+    type StatefulBadgeHandle,
+} from "@/components/stateful-badge";
+
+export function Example() {
+    const badgeRef = useRef<StatefulBadgeHandle>(null);
+
+    const handleClick = () => {
+        badgeRef.current?.updateState("loading");
+        
+        // fake async func
+        setTimeout(() => {
+            badgeRef.current?.updateState("success");
+        }, 2000);
+    };
+
+    return (
+        <div>
+            <StatefulBadge initialState="idle" ref={badgeRef} />
+            <button onClick={handleClick}>Start</button>
+        </div>
+    );
+}
+```
+
+## API Reference
+
+### StatefulBadge
+
+<TypeTable
+  type={{
+    initialState: {
+      required: true,
+      type: '"idle" | "loading" | "error" | "success" | "warning"',
+      description: "The initial state of the badge"
+    },
+    ref: {
+      required: true,
+      type: "Ref<StatefulBadgeHandle>",
+      description: "React ref to access the component's methods"
+    }
+  }}
+/>
+
+### StatefulBadgeHandle
+
+The ref exposes the following method:
+
+<TypeTable
+  type={{
+    updateState: {
+      type: "(newState: stateTypes) => void",
+      description: "Method to update the badge state"
+    }
+  }}
+/>
+
+### State Types
+
+The badge's supported states are: `idle`, `loading`, `success`, `warning`, and `error`

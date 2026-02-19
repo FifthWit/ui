@@ -1,9 +1,11 @@
 import { GhCardDemo } from "@/registry/demos/github-hover-card";
 import { SlidingMenuDemo } from "@/registry/demos/sliding-menu";
+import { StatefulBadgeDemo } from "@/registry/demos/stateful-badge";
 
 const previews: Record<string, React.ComponentType> = {
 	"gh-card": GhCardDemo,
 	"sliding-menu": SlidingMenuDemo,
+	"stateful-badge": StatefulBadgeDemo,
 };
 export function ComponentPreview({ name }: { name: string }) {
 	const Preview = previews[name];
