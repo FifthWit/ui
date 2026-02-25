@@ -38,13 +38,28 @@
 			"type": "registry:component",
 			"title": "Stateful Badge",
 			"description": "A Badge that animates when it's state is changed",
-			"dependencies": ["motion"],
+			"dependencies": ["motion", "@phosphor-icons/react"],
 			"registryDependencies": [],
 			"files": [
 				{
 					"path": "registry/components/stateful-badge.tsx",
 					"type": "registry:component",
 					"target": "components/stateful-badge.tsx"
+				}
+			]
+		},
+		{
+			"name": "collapsible",
+			"type": "registry:component",
+			"title": "Collapsible",
+			"description": "Animated Collapsible component",
+			"dependencies": ["motion", "@radix-ui/react-collapsible"],
+			"registryDependencies": [],
+			"files": [
+				{
+					"path": "registry/components/collapsible.tsx",
+					"type": "registry:component",
+					"target": "components/collapsible.tsx"
 				}
 			]
 		}
