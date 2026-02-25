@@ -161,7 +161,7 @@ export function CollapsibleItem({
 					: { ...defaultScaleAnimation, y: 0 - index * closedHeight - 20 }
 			}
 			className={cn(
-				"flex bg-card w-lg min-h-24 h-fit rounded-2xl border p-4 shadow-xl",
+				"flex bg-card w-[calc(100vw-16px)] max-w-lg min-h-24 h-fit rounded-2xl border p-4 shadow-xl",
 				className,
 			)}
 			style={{ zIndex: 0 - index, ...motionProps.style }}
