@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 type CollapsibleContextType = {
 	height: number | null;
 	setHeight: (v: number) => void;
-	maxIndex: number; // Not currently needed, but potentially useful if adding a `side` prop needs adding
+	maxIndex: number;
 	setMaxIndex: (v: number) => void;
 	isOpen: boolean;
-};
+} & Required<CollapsibleCustomizations>;
 
 const CollapsibleContext = React.createContext<CollapsibleContextType | null>(
 	null,
@@ -27,13 +27,28 @@ function useCollapsibleContext() {
 	return context;
 }
 
+type CollapsibleCustomizations = {
+	/** Number of items visible in the stack when collapsed. @default 4 */
+	maxVisibleItems?: number;
+	/** gap in px between cards. Do not manually set with CSS @default 8 */
+	gap?: number;
+	scaleStep?: number;
+	springConfig?: { duration?: number; bounce?: number };
+	fallbackHeight?: number;
+};
+
 export function Collapsible({
 	className,
 	open,
 	onOpenChange,
 	defaultOpen,
+	maxVisibleItems = 4,
+	scaleStep = 0.05,
+	springConfig = { duration: 0.3, bounce: 0.1 },
+	fallbackHeight = 90,
+	gap = 8,
 	...props
-}: CollapsiblePrimitive.CollapsibleProps) {
+}: CollapsiblePrimitive.CollapsibleProps & CollapsibleCustomizations) {
 	const [height, setHeight] = React.useState<number | null>(null);
 	const [maxIndex, setMaxIndex] = React.useState<number>(0);
 	const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
@@ -51,6 +66,11 @@ export function Collapsible({
 				isOpen: open ?? isOpen,
 				maxIndex,
 				setMaxIndex,
+				maxVisibleItems,
+				scaleStep,
+				springConfig,
+				fallbackHeight,
+				gap,
 			}}
 		>
 			<CollapsiblePrimitive.Root
@@ -83,7 +103,8 @@ export function CollapsibleContent({
 }: Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
 	children: React.ReactNode;
 }) {
-	const { height, maxIndex, setMaxIndex, isOpen } = useCollapsibleContext();
+	const { height, maxIndex, setMaxIndex, isOpen, gap } =
+		useCollapsibleContext();
 
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
@@ -93,15 +114,16 @@ export function CollapsibleContent({
 
 	return (
 		<CollapsiblePrimitive.Content
-			className={cn("m-2 flex flex-col gap-2", className)}
-			style={
-				isOpen
+			className={cn("m-2 flex flex-col", className)}
+			style={{
+				gap: `${gap}px`,
+				...(isOpen
 					? { height: "auto" }
 					: {
 							// Jerry rigged height calcs, its taking the front element's height, adding roughly how many elements are visible below it multiplied by the gap(8px)
 							height: `${height ?? 90 + (maxIndex < 4 ? maxIndex * 8 : 5 * 8)}px`,
-						}
-			}
+						}),
+			}}
 			forceMount
 			{...props}
 		>
@@ -135,10 +157,18 @@ export function CollapsibleItem({
 	rootClassName,
 	...props
 }: CollapsibleItemProps) {
-	const { height, setHeight, isOpen } = useCollapsibleContext();
+	const {
+		scaleStep,
+		height,
+		setHeight,
+		fallbackHeight,
+		isOpen,
+		maxVisibleItems,
+		springConfig,
+	} = useCollapsibleContext();
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
 	const open = isOpen;
-	const closedHeight = height ?? 90;
+	const closedHeight = height ?? fallbackHeight;
 
 	React.useEffect(() => {
 		if (internalRef.current && index === 0) {
@@ -156,18 +186,20 @@ export function CollapsibleItem({
 				open
 					? { scale: 1, y: 0, opacity: 1 }
 					: {
-							scale: 1 - 0.05 * index,
+							scale: 1 - scaleStep * index,
 							// needed to keep uniform stacking distance regardless of the height, the first part places the divs all on top of each other with only the gap from padding moving them,
 							// but with large heights the parallax-esque scale effect can actually hide it under the top item, so we take its height,
-							// and multiply it by 0.05*index which gives us the value of the height it loses,
+							// and multiply it by scaleStep*index which gives us the value of the height it loses,
 							// then we offset it by that value/2 to push it down again regardless of height.
-							y: 0 - index * closedHeight + (closedHeight * (0.05 * index)) / 2,
-							opacity: index > 3 ? 0 : 1,
+							y:
+								0 -
+								index * closedHeight +
+								(closedHeight * (scaleStep * index)) / 2,
+							opacity: index > maxVisibleItems - 1 ? 0 : 1,
 						}
 			}
 			initial={
-				// The cards need to have their height manually set to where it should be, otherwise the component starts where it'd be if it was open
-				!open && index < 4
+				!open && index < maxVisibleItems
 					? {
 							...defaultScaleAnimation,
 							y: 0 - index * closedHeight - closedHeight / 2,
@@ -183,9 +215,8 @@ export function CollapsibleItem({
 			}
 			style={{ zIndex: 0 - index, ...props.style }}
 			transition={{
-				duration: 0.35,
 				type: "spring",
-				bounce: 0.15,
+				...springConfig,
 			}}
 			className={cn(rootClassName)}
 			{...props}

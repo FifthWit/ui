@@ -80,7 +80,12 @@ export function CollapsibleDemo() {
 					Remove Random Item
 				</Button>
 			</div>
-			<Collapsible open={open} onOpenChange={setOpen}>
+			<Collapsible
+				open={open}
+				onOpenChange={setOpen}
+				gap={16}
+				scaleStep={0.0487}
+			>
 				<CollapsibleTrigger
 					asChild
 					className="z-10 flex flex-row w-[calc(100vw-16px)] sm:w-lg"
