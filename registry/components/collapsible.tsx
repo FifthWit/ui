@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 type CollapsibleContextType = {
 	height: number | null;
 	setHeight: (v: number) => void;
-	maxIndex: number;
+	maxIndex: number; // Not currently needed, but potentially useful if adding a `side` prop needs adding
 	setMaxIndex: (v: number) => void;
 	isOpen: boolean;
 };
@@ -54,7 +54,7 @@ export function Collapsible({
 			}}
 		>
 			<CollapsiblePrimitive.Root
-				className={cn("flex flex-col justify-center items-center", className)}
+				className={cn("flex flex-col items-center", className)}
 				open={open ?? isOpen}
 				onOpenChange={handleOpenChange}
 				defaultOpen={defaultOpen}
@@ -77,7 +77,7 @@ export function CollapsibleContent({
 }: Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
 	children: React.ReactNode;
 }) {
-	const { setMaxIndex, isOpen } = useCollapsibleContext();
+	const { height, maxIndex, setMaxIndex, isOpen } = useCollapsibleContext();
 
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
@@ -85,11 +85,15 @@ export function CollapsibleContent({
 
 	return (
 		<CollapsiblePrimitive.Content
-			className={cn(
-				"m-2 flex flex-col gap-2",
-				isOpen ? "h-auto" : "h-32.5",
-				className,
-			)}
+			className={cn("m-2 flex flex-col gap-2", className)}
+			style={
+				isOpen
+					? { height: "auto" }
+					: {
+							// Jerry rigged height calcs, its taking the front element's height, adding roughly how many elements are visible below it multiplied by the gap(8px)
+							height: `${height ?? 90 + (maxIndex < 4 ? maxIndex * 8 : 5 * 8)}px`,
+						}
+			}
 			forceMount
 			{...props}
 		>
@@ -114,12 +118,7 @@ export function CollapsibleItem({
 	open: openProp,
 	...motionProps
 }: CollapsibleItemProps) {
-	const {
-		maxIndex,
-		height,
-		setHeight,
-		isOpen: contextOpen,
-	} = useCollapsibleContext();
+	const { height, setHeight, isOpen: contextOpen } = useCollapsibleContext();
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
 	const open = openProp ?? contextOpen;
 	const closedHeight = height ?? 90;
@@ -129,7 +128,10 @@ export function CollapsibleItem({
 			setHeight(internalRef.current.clientHeight);
 		}
 	}, [index, setHeight]);
-
+	const defaultScaleAnimation = {
+		scale: 0.8,
+		opacity: 0,
+	};
 	return (
 		<motion.div
 			layout
@@ -143,21 +145,23 @@ export function CollapsibleItem({
 						}
 			}
 			initial={
-				open || maxIndex < 4
+				// The cards need to have their height manually set to where it should be, otherwise the component starts where it'd be if it was open
+				!open && index < 4
 					? {
-							scale: 0.8,
-							opacity: 0,
-							y: 0 - index * closedHeight + (height ?? 90) / 2,
+							...defaultScaleAnimation,
+							y: 0 - index * closedHeight + closedHeight / 2,
 						}
-					: false
+					: open
+						? { scale: 0.8, opacity: 0.6, y: -20 }
+						: false
 			}
 			exit={
 				open
-					? { scale: 0.8, opacity: 0, y: -20 }
-					: { scale: 0.8, opacity: 0, y: 0 - index * closedHeight - 20 }
+					? { ...defaultScaleAnimation, y: -20 }
+					: { ...defaultScaleAnimation, y: 0 - index * closedHeight - 20 }
 			}
 			className={cn(
-				"flex bg-card w-lg min-h-24 h-fit rounded-2xl border p-4 gap-x-2 shadow-xl",
+				"flex bg-card w-lg min-h-24 h-fit rounded-2xl border p-4 shadow-xl",
 				className,
 			)}
 			style={{ zIndex: 0 - index, ...motionProps.style }}

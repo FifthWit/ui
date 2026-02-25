@@ -11,17 +11,30 @@ import {
 import { CaretUpIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
-function generateItems(count: number) {
-	return Array.from({ length: count }, () => ({
+function randomEntry() {
+	return {
 		id: crypto.randomUUID(),
-		text: faker.lorem.sentence(),
-	}));
+		name: faker.person.fullName(),
+		account: `${faker.finance.accountName()}`,
+		amount: `${(Math.random()) > 0.5 ? "-" : "+"} ${faker.finance.amount({ min: 5, max: 100, dec: 2, symbol: `${Math.random() > 0.5 ? "€" : "$"}` })}`,
+		when: `${faker.number.int({ min: 1, max: 6 })} days ago`,
+	};
+}
+
+function generateItems(count: number) {
+	return Array.from({ length: count }, () => randomEntry());
 }
 
 export function CollapsibleDemo() {
-	const [demoItems, setDemoItems] = useState<{ id: string; text: string }[]>(
-		[],
-	);
+	const [demoItems, setDemoItems] = useState<
+		{
+			id: string;
+			name: string;
+			amount: string;
+			when: string;
+			account: string;
+		}[]
+	>([]);
 	const [open, setOpen] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -31,7 +44,7 @@ export function CollapsibleDemo() {
 	function addNewItem(): void {
 		setDemoItems((items) => {
 			const randomIndex = Math.floor(Math.random() * (items.length + 1));
-			const newItem = { id: crypto.randomUUID(), text: faker.lorem.sentence() };
+			const newItem = randomEntry();
 			return [
 				...items.slice(0, randomIndex),
 				newItem,
@@ -49,18 +62,18 @@ export function CollapsibleDemo() {
 	}
 
 	return (
-		<div className="flex flex-col items-center gap-2 min-h-screen">
+		<div className="flex flex-col items-center gap-2 min-h-screen min-w-lg">
 			<div className="flex flex-row gap-2">
 				<button
 					type="button"
-					className="z-10 bg-accent text-accent-foreground p-1 rounded-lg border"
+					className="cursor-pointer active:scale-98 duration-75 transition-all ease-out z-10 bg-accent text-accent-foreground p-1 rounded-lg border"
 					onClick={addNewItem}
 				>
 					Add Random Item
 				</button>
 				<button
 					type="button"
-					className="z-10 bg-accent text-accent-foreground p-1 rounded-lg border"
+					className="cursor-pointer active:scale-98 duration-75 transition-all ease-out z-10 bg-accent text-accent-foreground p-1 rounded-lg border"
 					onClick={removeRandomItem}
 				>
 					Remove Random Item
@@ -80,8 +93,28 @@ export function CollapsibleDemo() {
 				</CollapsibleTrigger>
 				<CollapsibleContent>
 					{demoItems.map((item, index) => (
-						<CollapsibleItem key={item.id} index={index} open={open}>
-							<div>{item.text}</div>
+						<CollapsibleItem
+							key={item.id}
+							index={index}
+							open={open}
+							className="flex flex-row justify-between"
+						>
+							<div className="flex flex-col gap-1">
+								<span className="text-xs font-light text-muted-foreground">
+									{item.account}
+								</span>
+								<span className="text-lg text-card-foreground">
+									{item.amount}
+								</span>
+							</div>
+							<div className="flex flex-col gap-1">
+								<span className="text-sm text-muted-foreground text-right">
+									{item.when}
+								</span>
+								<span className="text-md font-light text-card-foreground text-right">
+									{item.name}
+								</span>
+							</div>
 						</CollapsibleItem>
 					))}
 				</CollapsibleContent>
