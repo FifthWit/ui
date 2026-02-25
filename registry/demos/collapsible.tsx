@@ -80,12 +80,7 @@ export function CollapsibleDemo() {
 					Remove Random Item
 				</Button>
 			</div>
-			<Collapsible
-				open={open}
-				onOpenChange={setOpen}
-				gap={16}
-				scaleStep={0.0487}
-			>
+			<Collapsible open={open} onOpenChange={setOpen} gap={8} scaleStep={0.05}>
 				<CollapsibleTrigger
 					asChild
 					className="z-10 flex flex-row w-[calc(100vw-16px)] sm:w-lg"
@@ -109,7 +104,7 @@ export function CollapsibleDemo() {
 					{demoItems.map((item) => (
 						<CollapsibleItem
 							key={item.id}
-							className="flex flex-col *:flex *:flex-row *:gap-1 *:justify-between"
+							className="flex flex-col *:flex *:flex-row *:gap-1 *:justify-between w-[calc(100vw-16px)] max-w-lg"
 						>
 							<div className="*:text-xs *:font-light *:text-muted-foreground">
 								<span>{item.account}</span>

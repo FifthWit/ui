@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 type CollapsibleContextType = {
@@ -103,8 +103,15 @@ export function CollapsibleContent({
 }: Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
 	children: React.ReactNode;
 }) {
-	const { height, maxIndex, setMaxIndex, isOpen, gap } =
-		useCollapsibleContext();
+	const {
+		height,
+		maxIndex,
+		setMaxIndex,
+		isOpen,
+		gap,
+		fallbackHeight,
+		maxVisibleItems,
+	} = useCollapsibleContext();
 
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
@@ -120,8 +127,11 @@ export function CollapsibleContent({
 				...(isOpen
 					? { height: "auto" }
 					: {
-							// Jerry rigged height calcs, its taking the front element's height, adding roughly how many elements are visible below it multiplied by the gap(8px)
-							height: `${height ?? 90 + (maxIndex < 4 ? maxIndex * 8 : 5 * 8)}px`,
+							height:
+								(height == null ? fallbackHeight : height) +
+								gap *
+									((maxIndex < maxVisibleItems ? maxIndex : maxVisibleItems) -
+										1),
 						}),
 			}}
 			forceMount
@@ -147,14 +157,12 @@ export type CollapsibleItemProps = Omit<
 > & {
 	index?: number;
 	children: React.ReactNode;
-	rootClassName?: string;
 };
 
 export function CollapsibleItem({
 	children,
-	className,
 	index = 0,
-	rootClassName,
+	className,
 	...props
 }: CollapsibleItemProps) {
 	const {
@@ -167,7 +175,6 @@ export function CollapsibleItem({
 		springConfig,
 	} = useCollapsibleContext();
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
-	const open = isOpen;
 	const closedHeight = height ?? fallbackHeight;
 
 	React.useEffect(() => {
@@ -183,7 +190,7 @@ export function CollapsibleItem({
 		<motion.div
 			layout
 			animate={
-				open
+				isOpen
 					? { scale: 1, y: 0, opacity: 1 }
 					: {
 							scale: 1 - scaleStep * index,
@@ -199,32 +206,34 @@ export function CollapsibleItem({
 						}
 			}
 			initial={
-				!open && index < maxVisibleItems
+				!isOpen && index < maxVisibleItems
 					? {
 							...defaultScaleAnimation,
 							y: 0 - index * closedHeight - closedHeight / 2,
 						}
-					: open
+					: isOpen
 						? { scale: 0.8, opacity: 0.6, y: -20 }
 						: false
 			}
 			exit={
-				open
+				isOpen
 					? { ...defaultScaleAnimation, y: -20 }
-					: { ...defaultScaleAnimation, y: 0 - index * closedHeight - 20 }
+					: {
+							...defaultScaleAnimation,
+							y: 0 - index * closedHeight - 20,
+						}
 			}
 			style={{ zIndex: 0 - index, ...props.style }}
 			transition={{
 				type: "spring",
 				...springConfig,
 			}}
-			className={cn(rootClassName)}
 			{...props}
 		>
 			<div
 				ref={internalRef}
 				className={cn(
-					"flex bg-card w-[calc(100vw-16px)] max-w-lg rounded-2xl border p-4 shadow-2xl",
+					"flex bg-card rounded-2xl p-4 shadow-sm ring ring-border ring-inset", // Ring is needed since border offsets, then breaks the CollapsibleContent sizing calculations.
 					className,
 				)}
 			>
