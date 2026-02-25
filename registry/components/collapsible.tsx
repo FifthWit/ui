@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
-import { Slot } from "@radix-ui/react-slot";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -72,7 +71,7 @@ export function CollapsibleTrigger({
 }: CollapsiblePrimitive.CollapsibleTriggerProps) {
 	return (
 		<CollapsiblePrimitive.Trigger asChild={asChild} {...props}>
-			{asChild ? <Slot>{children}</Slot> : children}
+			{children}
 		</CollapsiblePrimitive.Trigger>
 	);
 }
