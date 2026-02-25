@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
+import { Slot } from "@radix-ui/react-slot";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -65,9 +66,15 @@ export function Collapsible({
 }
 
 export function CollapsibleTrigger({
+	asChild = false,
+	children,
 	...props
 }: CollapsiblePrimitive.CollapsibleTriggerProps) {
-	return <CollapsiblePrimitive.Trigger {...props} />;
+	return (
+		<CollapsiblePrimitive.Trigger asChild={asChild} {...props}>
+			{asChild ? <Slot>{children}</Slot> : children}
+		</CollapsiblePrimitive.Trigger>
+	);
 }
 
 export function CollapsibleContent({
@@ -82,6 +89,8 @@ export function CollapsibleContent({
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
 	}, [children, setMaxIndex]);
+
+	const childArray = React.Children.toArray(children);
 
 	return (
 		<CollapsiblePrimitive.Content
@@ -98,33 +107,43 @@ export function CollapsibleContent({
 			{...props}
 		>
 			<AnimatePresence mode="popLayout" initial={false}>
-				{children}
+				{childArray.map((child, index) =>
+					React.isValidElement(child)
+						? React.cloneElement(
+								child as React.ReactElement<CollapsibleItemProps>,
+								{ index },
+							)
+						: child,
+				)}
 			</AnimatePresence>
 		</CollapsiblePrimitive.Content>
 	);
 }
 
-export type CollapsibleItemProps = React.ComponentPropsWithoutRef<
-	typeof motion.div
+export type CollapsibleItemProps = Omit<
+	React.ComponentPropsWithoutRef<typeof motion.div>,
+	"children"
 > & {
-	index: number;
-	open?: boolean;
+	index?: number;
+	children: React.ReactNode;
+	rootClassName?: string;
 };
 
 export function CollapsibleItem({
 	children,
 	className,
-	index,
-	open: openProp,
-	...motionProps
+	index = 0,
+	rootClassName,
+	...props
 }: CollapsibleItemProps) {
-	const { height, setHeight, isOpen: contextOpen } = useCollapsibleContext();
+	const { height, setHeight, isOpen } = useCollapsibleContext();
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
-	const open = openProp ?? contextOpen;
+	const open = isOpen;
 	const closedHeight = height ?? 90;
 
 	React.useEffect(() => {
 		if (internalRef.current && index === 0) {
+			console.log(internalRef.current.clientHeight);
 			setHeight(internalRef.current.clientHeight);
 		}
 	}, [index, setHeight]);
@@ -140,7 +159,11 @@ export function CollapsibleItem({
 					? { scale: 1, y: 0, opacity: 1 }
 					: {
 							scale: 1 - 0.05 * index,
-							y: 0 - index * closedHeight,
+							// needed to keep uniform stacking distance regardless of the height, the first part places the divs all on top of each other with only the gap from padding moving them,
+							// but with large heights the parallax-esque scale effect can actually hide it under the top item, so we take its height,
+							// and multiply it by 0.05*index which gives us the value of the height it loses,
+							// then we offset it by that value/2 to push it down again regardless of height.
+							y: 0 - index * closedHeight + (closedHeight * (0.05 * index)) / 2,
 							opacity: index > 3 ? 0 : 1,
 						}
 			}
@@ -149,7 +172,7 @@ export function CollapsibleItem({
 				!open && index < 4
 					? {
 							...defaultScaleAnimation,
-							y: 0 - index * closedHeight + closedHeight / 2,
+							y: 0 - index * closedHeight - closedHeight / 2,
 						}
 					: open
 						? { scale: 0.8, opacity: 0.6, y: -20 }
@@ -160,19 +183,24 @@ export function CollapsibleItem({
 					? { ...defaultScaleAnimation, y: -20 }
 					: { ...defaultScaleAnimation, y: 0 - index * closedHeight - 20 }
 			}
-			className={cn(
-				"flex bg-card w-[calc(100vw-16px)] max-w-lg min-h-24 h-fit rounded-2xl border p-4 shadow-xl",
-				className,
-			)}
-			style={{ zIndex: 0 - index, ...motionProps.style }}
+			style={{ zIndex: 0 - index, ...props.style }}
 			transition={{
 				duration: 0.35,
 				type: "spring",
 				bounce: 0.15,
 			}}
-			{...motionProps}
+			className={cn(rootClassName)}
+			{...props}
 		>
-			{children}
+			<div
+				ref={internalRef}
+				className={cn(
+					"flex bg-card w-[calc(100vw-16px)] max-w-lg rounded-2xl border p-4 shadow-2xl",
+					className,
+				)}
+			>
+				{children}
+			</div>
 		</motion.div>
 	);
 }
