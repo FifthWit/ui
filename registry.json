@@ -47,6 +47,21 @@
 					"target": "components/stateful-badge.tsx"
 				}
 			]
+		},
+		{
+			"name": "collapsible",
+			"type": "registry:component",
+			"title": "Collapsible",
+			"description": "Animated Collapsible component",
+			"dependencies": ["motion", "@radix-ui/react-collapsible"],
+			"registryDependencies": [],
+			"files": [
+				{
+					"path": "registry/components/collapsible.tsx",
+					"type": "registry:component",
+					"target": "components/collapsible.tsx"
+				}
+			]
 		}
 	]
 }
