@@ -143,7 +143,6 @@ export function CollapsibleItem({
 
 	React.useEffect(() => {
 		if (internalRef.current && index === 0) {
-			console.log(internalRef.current.clientHeight);
 			setHeight(internalRef.current.clientHeight);
 		}
 	}, [index, setHeight]);
