@@ -3,7 +3,10 @@
   "name": "stateful-badge",
   "title": "Stateful Badge",
   "description": "A Badge that animates when it's state is changed",
-  "dependencies": ["motion", "@phosphor-icons/react"],
+  "dependencies": [
+    "motion",
+    "@phosphor-icons/react"
+  ],
   "registryDependencies": [],
   "files": [
     {

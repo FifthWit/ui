@@ -62,7 +62,7 @@ export function CollapsibleDemo() {
 	}
 
 	return (
-		<div className="flex flex-col items-center gap-2 min-h-screen min-w-lg">
+		<div className="flex flex-col items-center gap-2 min-h-screen w-sm">
 			<div className="flex flex-row gap-2">
 				<button
 					type="button"
