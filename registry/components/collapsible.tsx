@@ -37,7 +37,7 @@ type CollapsibleCustomizations = {
 	fallbackHeight?: number;
 };
 
-const DEFAULT_SPRING = { duration: 0.3, bounce: 0.1 } as const;
+const DEFAULT_SPRING = { duration: 0.2, bounce: 0.1 } as const;
 
 export function Collapsible({
 	className,
