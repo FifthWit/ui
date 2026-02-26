@@ -11,6 +11,7 @@ type CollapsibleContextType = {
 	maxIndex: number;
 	setMaxIndex: (v: number) => void;
 	isOpen: boolean;
+	onOpenChange(open: boolean): void;
 	prefersReducedMotion: boolean;
 } & Required<CollapsibleCustomizations>;
 
@@ -53,7 +54,9 @@ export function Collapsible({
 	gap = 8,
 	...props
 }: CollapsiblePrimitive.CollapsibleProps &
-	CollapsibleCustomizations & { ref?: React.Ref<HTMLDivElement> }) {
+	CollapsibleCustomizations & {
+		ref?: React.Ref<HTMLDivElement>;
+	}) {
 	const [height, setHeight] = React.useState<number | null>(null);
 	const [maxIndex, setMaxIndex] = React.useState<number>(0);
 	const prefersReducedMotion = useReducedMotion();
@@ -71,6 +74,7 @@ export function Collapsible({
 				scaleStep,
 				springConfig,
 				fallbackHeight,
+				onOpenChange: onOpenChange ?? (() => {}),
 				gap,
 			}}
 		>
@@ -114,7 +118,6 @@ export function CollapsibleContent({
 		fallbackHeight,
 		maxVisibleItems,
 	} = useCollapsibleContext();
-
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
 	}, [children, setMaxIndex]);
@@ -178,6 +181,7 @@ export function CollapsibleItem({
 		maxIndex,
 		prefersReducedMotion,
 	} = useCollapsibleContext();
+
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
 	const closedHeight = height ?? fallbackHeight;
 
