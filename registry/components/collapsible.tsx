@@ -232,6 +232,7 @@ export function CollapsibleItem({
 		>
 			<div
 				ref={internalRef}
+				aria-hidden={!(isOpen || !(index > 0))}
 				className={cn(
 					"flex bg-card rounded-2xl p-4 shadow-sm ring ring-border ring-inset", // Ring is needed since border offsets, then breaks the CollapsibleContent sizing calculations.
 					className,
