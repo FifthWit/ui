@@ -37,33 +37,31 @@ type CollapsibleCustomizations = {
 	fallbackHeight?: number;
 };
 
+const DEFAULT_SPRING = { duration: 0.3, bounce: 0.1 } as const;
+
 export function Collapsible({
 	className,
-	open,
+	ref,
+	open = false,
 	onOpenChange,
 	defaultOpen,
 	maxVisibleItems = 4,
 	scaleStep = 0.05,
-	springConfig = { duration: 0.3, bounce: 0.1 },
+	springConfig = DEFAULT_SPRING,
 	fallbackHeight = 90,
 	gap = 8,
 	...props
-}: CollapsiblePrimitive.CollapsibleProps & CollapsibleCustomizations) {
+}: CollapsiblePrimitive.CollapsibleProps &
+	CollapsibleCustomizations & { ref?: React.Ref<HTMLDivElement> }) {
 	const [height, setHeight] = React.useState<number | null>(null);
 	const [maxIndex, setMaxIndex] = React.useState<number>(0);
-	const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
-
-	const handleOpenChange = (val: boolean) => {
-		setIsOpen(val);
-		onOpenChange?.(val);
-	};
 
 	return (
 		<CollapsibleContext.Provider
 			value={{
 				height,
 				setHeight,
-				isOpen: open ?? isOpen,
+				isOpen: open,
 				maxIndex,
 				setMaxIndex,
 				maxVisibleItems,
@@ -74,9 +72,10 @@ export function Collapsible({
 			}}
 		>
 			<CollapsiblePrimitive.Root
+				ref={ref}
 				className={cn("flex flex-col items-center", className)}
-				open={open ?? isOpen}
-				onOpenChange={handleOpenChange}
+				open={open}
+				onOpenChange={onOpenChange}
 				defaultOpen={defaultOpen}
 				{...props}
 			/>
@@ -173,6 +172,7 @@ export function CollapsibleItem({
 		isOpen,
 		maxVisibleItems,
 		springConfig,
+		maxIndex,
 	} = useCollapsibleContext();
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
 	const closedHeight = height ?? fallbackHeight;
@@ -223,7 +223,7 @@ export function CollapsibleItem({
 							y: 0 - index * closedHeight - 20,
 						}
 			}
-			style={{ zIndex: 0 - index, ...props.style }}
+			style={{ zIndex: maxIndex - index, ...props.style }}
 			transition={{
 				type: "spring",
 				...springConfig,
