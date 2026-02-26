@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 type CollapsibleContextType = {
@@ -11,6 +11,7 @@ type CollapsibleContextType = {
 	maxIndex: number;
 	setMaxIndex: (v: number) => void;
 	isOpen: boolean;
+	prefersReducedMotion: boolean;
 } & Required<CollapsibleCustomizations>;
 
 const CollapsibleContext = React.createContext<CollapsibleContextType | null>(
@@ -55,15 +56,17 @@ export function Collapsible({
 	CollapsibleCustomizations & { ref?: React.Ref<HTMLDivElement> }) {
 	const [height, setHeight] = React.useState<number | null>(null);
 	const [maxIndex, setMaxIndex] = React.useState<number>(0);
+	const prefersReducedMotion = useReducedMotion();
 
 	return (
 		<CollapsibleContext.Provider
 			value={{
 				height,
 				setHeight,
-				isOpen: open,
 				maxIndex,
 				setMaxIndex,
+				isOpen: open,
+				prefersReducedMotion: prefersReducedMotion ?? false,
 				maxVisibleItems,
 				scaleStep,
 				springConfig,
@@ -173,6 +176,7 @@ export function CollapsibleItem({
 		maxVisibleItems,
 		springConfig,
 		maxIndex,
+		prefersReducedMotion,
 	} = useCollapsibleContext();
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
 	const closedHeight = height ?? fallbackHeight;
@@ -188,45 +192,58 @@ export function CollapsibleItem({
 	};
 	return (
 		<motion.div
-			layout
+			layout={!prefersReducedMotion}
 			animate={
-				isOpen
-					? { scale: 1, y: 0, opacity: 1 }
-					: {
-							scale: 1 - scaleStep * index,
-							// needed to keep uniform stacking distance regardless of the height, the first part places the divs all on top of each other with only the gap from padding moving them,
-							// but with large heights the parallax-esque scale effect can actually hide it under the top item, so we take its height,
-							// and multiply it by scaleStep*index which gives us the value of the height it loses,
-							// then we offset it by that value/2 to push it down again regardless of height.
-							y:
-								0 -
-								index * closedHeight +
-								(closedHeight * (scaleStep * index)) / 2,
-							opacity: index > maxVisibleItems - 1 ? 0 : 1,
-						}
-			}
-			initial={
-				!isOpen && index < maxVisibleItems
+				prefersReducedMotion
 					? {
-							...defaultScaleAnimation,
-							y: 0 - index * closedHeight - closedHeight / 2,
+							opacity: isOpen || index === 0 ? 1 : 0,
 						}
 					: isOpen
-						? { scale: 0.8, opacity: 0.6, y: -20 }
-						: false
+						? { scale: 1, y: 0, opacity: 1 }
+						: {
+								scale: 1 - scaleStep * index,
+								// needed to keep uniform stacking distance regardless of the height, the first part places the divs all on top of each other with only the gap from padding moving them,
+								// but with large heights the parallax-esque scale effect can actually hide it under the top item, so we take its height,
+								// and multiply it by scaleStep*index which gives us the value of the height it loses,
+								// then we offset it by that value/2 to push it down again regardless of height.
+								y:
+									0 -
+									index * closedHeight +
+									(closedHeight * (scaleStep * index)) / 2,
+								opacity: index > maxVisibleItems - 1 ? 0 : 1,
+							}
+			}
+			initial={
+				prefersReducedMotion
+					? false
+					: !isOpen && index < maxVisibleItems
+						? {
+								...defaultScaleAnimation,
+								y: 0 - index * closedHeight - closedHeight / 2,
+							}
+						: isOpen
+							? { scale: 0.8, opacity: 0.6, y: -20 }
+							: false
 			}
 			exit={
-				isOpen
-					? { ...defaultScaleAnimation, y: -20 }
-					: {
-							...defaultScaleAnimation,
-							y: 0 - index * closedHeight - 20,
-						}
+				prefersReducedMotion
+					? undefined
+					: isOpen
+						? { ...defaultScaleAnimation, y: -20 }
+						: {
+								...defaultScaleAnimation,
+								y: 0 - index * closedHeight - 20,
+							}
 			}
 			style={{ zIndex: maxIndex - index, ...props.style }}
 			transition={{
 				type: "spring",
 				...springConfig,
+				opacity: {
+					type: "tween",
+					ease: "linear",
+					duration: prefersReducedMotion ? 0 : 0.1,
+				},
 			}}
 			{...props}
 		>
