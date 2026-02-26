@@ -10,6 +10,7 @@ import {
 } from "../components/collapsible";
 import { CaretUpIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 function randomEntry() {
 	return {
@@ -64,56 +65,54 @@ export function CollapsibleDemo() {
 	return (
 		<div className="flex flex-col items-center gap-2 min-h-screen w-sm">
 			<div className="flex flex-row gap-2">
-				<button
-					type="button"
-					className="cursor-pointer active:scale-98 duration-75 transition-all ease-out z-10 bg-accent text-accent-foreground p-1 rounded-lg border"
+				<Button
+					variant="secondary"
+					className="active:scale-98 duration-75 transition-all ease-out"
 					onClick={addNewItem}
 				>
 					Add Random Item
-				</button>
-				<button
-					type="button"
-					className="cursor-pointer active:scale-98 duration-75 transition-all ease-out z-10 bg-accent text-accent-foreground p-1 rounded-lg border"
+				</Button>
+				<Button
+					variant="secondary"
+					className="active:scale-98 duration-75 transition-all ease-out"
 					onClick={removeRandomItem}
 				>
 					Remove Random Item
-				</button>
+				</Button>
 			</div>
-			<Collapsible open={open} onOpenChange={setOpen}>
-				<CollapsibleTrigger className="z-10 flex flex-row w-full justify-between px-4 p-2 items-center cursor-pointer active:scale-98 duration-75 ease-out">
-					<span>Recent Transactions</span>
-					<span>
-						<CaretUpIcon
-							className={cn(
-								"h-6 w-6 bg-accent p-1 rounded-full transition-all duration-300 ease-in-out text-accent-foreground",
-								open ? "rotate-z-0" : "rotate-z-180",
-							)}
-						/>
-					</span>
+			<Collapsible open={open} onOpenChange={setOpen} gap={8}>
+				<CollapsibleTrigger
+					asChild
+					className="z-10 flex flex-row w-[calc(100vw-16px)] sm:w-lg"
+				>
+					<Button
+						variant="secondary"
+						className="active:scale-98 duration-75 transition-all ease-out cursor-pointer flex flex-row justify-between rounded-2xl w-full"
+					>
+						<span>Recent Transactions</span>
+						<span>
+							<CaretUpIcon
+								className={cn(
+									"rounded-full transition-all duration-200 ease-in-out text-foreground",
+									open ? "rotate-z-0" : "rotate-z-180",
+								)}
+							/>
+						</span>
+					</Button>
 				</CollapsibleTrigger>
 				<CollapsibleContent>
-					{demoItems.map((item, index) => (
+					{demoItems.map((item) => (
 						<CollapsibleItem
 							key={item.id}
-							index={index}
-							open={open}
-							className="flex flex-row justify-between"
+							className="flex flex-col *:flex *:flex-row *:gap-1 *:justify-between w-[calc(100vw-16px)] max-w-lg"
 						>
-							<div className="flex flex-col gap-1">
-								<span className="text-xs font-light text-muted-foreground">
-									{item.account}
-								</span>
-								<span className="text-lg text-card-foreground">
-									{item.amount}
-								</span>
+							<div className="*:text-xs *:font-light *:text-muted-foreground">
+								<span>{item.account}</span>
+								<span>{item.when}</span>
 							</div>
-							<div className="flex flex-col gap-1">
-								<span className="text-sm text-muted-foreground text-right">
-									{item.when}
-								</span>
-								<span className="text-md font-light text-card-foreground text-right">
-									{item.name}
-								</span>
+							<div className="*:text-lg *:text-card-foreground">
+								<span className="font-bold">{item.amount}</span>
+								<span className="font-light">{item.name}</span>
 							</div>
 						</CollapsibleItem>
 					))}

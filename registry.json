@@ -1,67 +1,67 @@
 {
-	"$schema": "https://ui.shadcn.com/schema/registry.json",
-	"name": "fifth-ui",
-	"homepage": "ui.fifthwit.net",
-	"items": [
-		{
-			"name": "gh-hover-card",
-			"type": "registry:component",
-			"title": "Github Hover Card",
-			"description": "A card with a smooth hover effect design from the GitHub website",
-			"dependencies": [],
-			"registryDependencies": [],
-			"files": [
-				{
-					"path": "registry/components/github-hover-card.tsx",
-					"type": "registry:component",
-					"target": "components/github-hover-card.tsx"
-				}
-			]
-		},
-		{
-			"name": "sliding-menu",
-			"type": "registry:component",
-			"title": "Sliding Menu",
-			"description": "A Dropdown menu that slides between selected items",
-			"dependencies": ["tw-animate-css", "@radix-ui/react-popover"],
-			"registryDependencies": [],
-			"files": [
-				{
-					"path": "registry/components/sliding-menu.tsx",
-					"type": "registry:component",
-					"target": "components/sliding-menu.tsx"
-				}
-			]
-		},
-		{
-			"name": "stateful-badge",
-			"type": "registry:component",
-			"title": "Stateful Badge",
-			"description": "A Badge that animates when it's state is changed",
-			"dependencies": ["motion", "@phosphor-icons/react"],
-			"registryDependencies": [],
-			"files": [
-				{
-					"path": "registry/components/stateful-badge.tsx",
-					"type": "registry:component",
-					"target": "components/stateful-badge.tsx"
-				}
-			]
-		},
-		{
-			"name": "collapsible",
-			"type": "registry:component",
-			"title": "Collapsible",
-			"description": "Animated Collapsible component",
-			"dependencies": ["motion", "@radix-ui/react-collapsible"],
-			"registryDependencies": [],
-			"files": [
-				{
-					"path": "registry/components/collapsible.tsx",
-					"type": "registry:component",
-					"target": "components/collapsible.tsx"
-				}
-			]
-		}
-	]
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "fifth-ui",
+  "homepage": "ui.fifthwit.net",
+  "items": [
+    {
+      "name": "gh-hover-card",
+      "type": "registry:component",
+      "title": "Github Hover Card",
+      "description": "A card with a smooth hover effect design from the GitHub website",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/github-hover-card.tsx",
+          "type": "registry:component",
+          "target": "components/github-hover-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sliding-menu",
+      "type": "registry:component",
+      "title": "Sliding Menu",
+      "description": "A Dropdown menu that slides between selected items",
+      "dependencies": ["tw-animate-css", "@radix-ui/react-popover"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/sliding-menu.tsx",
+          "type": "registry:component",
+          "target": "components/sliding-menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "stateful-badge",
+      "type": "registry:component",
+      "title": "Stateful Badge",
+      "description": "A Badge that animates when it's state is changed",
+      "dependencies": ["motion", "@phosphor-icons/react"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/stateful-badge.tsx",
+          "type": "registry:component",
+          "target": "components/stateful-badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:component",
+      "title": "Collapsible",
+      "description": "Animated Collapsible component",
+      "dependencies": ["motion", "@radix-ui/react-collapsible"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/collapsible.tsx",
+          "type": "registry:component",
+          "target": "components/collapsible.tsx"
+        }
+      ]
+    }
+  ]
 }

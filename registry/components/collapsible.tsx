@@ -2,16 +2,18 @@
 
 import React from "react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 type CollapsibleContextType = {
 	height: number | null;
 	setHeight: (v: number) => void;
-	maxIndex: number; // Not currently needed, but potentially useful if adding a `side` prop needs adding
+	maxIndex: number;
 	setMaxIndex: (v: number) => void;
 	isOpen: boolean;
-};
+	onOpenChange(open: boolean): void;
+	prefersReducedMotion: boolean;
+} & Required<CollapsibleCustomizations>;
 
 const CollapsibleContext = React.createContext<CollapsibleContextType | null>(
 	null,
@@ -27,36 +29,60 @@ function useCollapsibleContext() {
 	return context;
 }
 
+type CollapsibleCustomizations = {
+	/** Number of items visible in the stack when collapsed. @default 4 */
+	maxVisibleItems?: number;
+	/** gap in px between cards. Do not manually set with CSS @default 8 */
+	gap?: number;
+	scaleStep?: number;
+	springConfig?: { duration?: number; bounce?: number };
+	fallbackHeight?: number;
+};
+
+const DEFAULT_SPRING = { duration: 0.2, bounce: 0.1 } as const;
+
 export function Collapsible({
 	className,
-	open,
+	ref,
+	open = false,
 	onOpenChange,
 	defaultOpen,
+	maxVisibleItems = 4,
+	scaleStep = 0.05,
+	springConfig = DEFAULT_SPRING,
+	fallbackHeight = 90,
+	gap = 8,
 	...props
-}: CollapsiblePrimitive.CollapsibleProps) {
+}: CollapsiblePrimitive.CollapsibleProps &
+	CollapsibleCustomizations & {
+		ref?: React.Ref<HTMLDivElement>;
+	}) {
 	const [height, setHeight] = React.useState<number | null>(null);
 	const [maxIndex, setMaxIndex] = React.useState<number>(0);
-	const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
-
-	const handleOpenChange = (val: boolean) => {
-		setIsOpen(val);
-		onOpenChange?.(val);
-	};
+	const prefersReducedMotion = useReducedMotion();
 
 	return (
 		<CollapsibleContext.Provider
 			value={{
 				height,
 				setHeight,
-				isOpen: open ?? isOpen,
 				maxIndex,
 				setMaxIndex,
+				isOpen: open,
+				prefersReducedMotion: prefersReducedMotion ?? false,
+				maxVisibleItems,
+				scaleStep,
+				springConfig,
+				fallbackHeight,
+				onOpenChange: onOpenChange ?? (() => {}),
+				gap,
 			}}
 		>
 			<CollapsiblePrimitive.Root
+				ref={ref}
 				className={cn("flex flex-col items-center", className)}
-				open={open ?? isOpen}
-				onOpenChange={handleOpenChange}
+				open={open}
+				onOpenChange={onOpenChange}
 				defaultOpen={defaultOpen}
 				{...props}
 			/>
@@ -65,9 +91,15 @@ export function Collapsible({
 }
 
 export function CollapsibleTrigger({
+	asChild = false,
+	children,
 	...props
 }: CollapsiblePrimitive.CollapsibleTriggerProps) {
-	return <CollapsiblePrimitive.Trigger {...props} />;
+	return (
+		<CollapsiblePrimitive.Trigger asChild={asChild} {...props}>
+			{children}
+		</CollapsiblePrimitive.Trigger>
+	);
 }
 
 export function CollapsibleContent({
@@ -77,51 +109,81 @@ export function CollapsibleContent({
 }: Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
 	children: React.ReactNode;
 }) {
-	const { height, maxIndex, setMaxIndex, isOpen } = useCollapsibleContext();
-
+	const {
+		height,
+		maxIndex,
+		setMaxIndex,
+		isOpen,
+		gap,
+		fallbackHeight,
+		maxVisibleItems,
+	} = useCollapsibleContext();
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
 	}, [children, setMaxIndex]);
 
+	const childArray = React.Children.toArray(children);
+
 	return (
 		<CollapsiblePrimitive.Content
-			className={cn("m-2 flex flex-col gap-2", className)}
-			style={
-				isOpen
+			className={cn("m-2 flex flex-col", className)}
+			style={{
+				gap: `${gap}px`,
+				...(isOpen
 					? { height: "auto" }
 					: {
-							// Jerry rigged height calcs, its taking the front element's height, adding roughly how many elements are visible below it multiplied by the gap(8px)
-							height: `${height ?? 90 + (maxIndex < 4 ? maxIndex * 8 : 5 * 8)}px`,
-						}
-			}
+							height:
+								(height == null ? fallbackHeight : height) +
+								gap *
+									((maxIndex < maxVisibleItems ? maxIndex : maxVisibleItems) -
+										1),
+						}),
+			}}
 			forceMount
 			{...props}
 		>
 			<AnimatePresence mode="popLayout" initial={false}>
-				{children}
+				{childArray.map((child, index) =>
+					React.isValidElement(child)
+						? React.cloneElement(
+								child as React.ReactElement<CollapsibleItemProps>,
+								{ index },
+							)
+						: child,
+				)}
 			</AnimatePresence>
 		</CollapsiblePrimitive.Content>
 	);
 }
 
-export type CollapsibleItemProps = React.ComponentPropsWithoutRef<
-	typeof motion.div
+export type CollapsibleItemProps = Omit<
+	React.ComponentPropsWithoutRef<typeof motion.div>,
+	"children"
 > & {
-	index: number;
-	open?: boolean;
+	index?: number;
+	children: React.ReactNode;
 };
 
 export function CollapsibleItem({
 	children,
+	index = 0,
 	className,
-	index,
-	open: openProp,
-	...motionProps
+	...props
 }: CollapsibleItemProps) {
-	const { height, setHeight, isOpen: contextOpen } = useCollapsibleContext();
+	const {
+		scaleStep,
+		height,
+		setHeight,
+		fallbackHeight,
+		isOpen,
+		maxVisibleItems,
+		springConfig,
+		maxIndex,
+		prefersReducedMotion,
+	} = useCollapsibleContext();
+
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
-	const open = openProp ?? contextOpen;
-	const closedHeight = height ?? 90;
+	const closedHeight = height ?? fallbackHeight;
 
 	React.useEffect(() => {
 		if (internalRef.current && index === 0) {
@@ -134,45 +196,71 @@ export function CollapsibleItem({
 	};
 	return (
 		<motion.div
-			layout
+			layout={!prefersReducedMotion}
 			animate={
-				open
-					? { scale: 1, y: 0, opacity: 1 }
-					: {
-							scale: 1 - 0.05 * index,
-							y: 0 - index * closedHeight,
-							opacity: index > 3 ? 0 : 1,
+				prefersReducedMotion
+					? {
+							opacity: isOpen || index === 0 ? 1 : 0,
 						}
+					: isOpen
+						? { scale: 1, y: 0, opacity: 1 }
+						: {
+								scale: 1 - scaleStep * index,
+								// needed to keep uniform stacking distance regardless of the height, the first part places the divs all on top of each other with only the gap from padding moving them,
+								// but with large heights the parallax-esque scale effect can actually hide it under the top item, so we take its height,
+								// and multiply it by scaleStep*index which gives us the value of the height it loses,
+								// then we offset it by that value/2 to push it down again regardless of height.
+								y:
+									0 -
+									index * closedHeight +
+									(closedHeight * (scaleStep * index)) / 2,
+								opacity: index > maxVisibleItems - 1 ? 0 : 1,
+							}
 			}
 			initial={
-				// The cards need to have their height manually set to where it should be, otherwise the component starts where it'd be if it was open
-				!open && index < 4
-					? {
-							...defaultScaleAnimation,
-							y: 0 - index * closedHeight + closedHeight / 2,
-						}
-					: open
-						? { scale: 0.8, opacity: 0.6, y: -20 }
-						: false
+				prefersReducedMotion
+					? false
+					: !isOpen && index < maxVisibleItems
+						? {
+								...defaultScaleAnimation,
+								y: 0 - index * closedHeight - closedHeight / 2,
+							}
+						: isOpen
+							? { scale: 0.8, opacity: 0.6, y: -20 }
+							: false
 			}
 			exit={
-				open
-					? { ...defaultScaleAnimation, y: -20 }
-					: { ...defaultScaleAnimation, y: 0 - index * closedHeight - 20 }
+				prefersReducedMotion
+					? undefined
+					: isOpen
+						? { ...defaultScaleAnimation, y: -20 }
+						: {
+								...defaultScaleAnimation,
+								y: 0 - index * closedHeight - 20,
+							}
 			}
-			className={cn(
-				"flex bg-card w-[calc(100vw-16px)] max-w-lg min-h-24 h-fit rounded-2xl border p-4 shadow-xl",
-				className,
-			)}
-			style={{ zIndex: 0 - index, ...motionProps.style }}
+			style={{ zIndex: maxIndex - index, ...props.style }}
 			transition={{
-				duration: 0.35,
 				type: "spring",
-				bounce: 0.15,
+				...springConfig,
+				opacity: {
+					type: "tween",
+					ease: "linear",
+					duration: prefersReducedMotion ? 0 : 0.1,
+				},
 			}}
-			{...motionProps}
+			{...props}
 		>
-			{children}
+			<div
+				ref={internalRef}
+				aria-hidden={!(isOpen || !(index > 0))}
+				className={cn(
+					"flex bg-card rounded-2xl p-4 shadow-sm ring ring-border ring-inset", // Ring is needed since border offsets, then breaks the CollapsibleContent sizing calculations.
+					className,
+				)}
+			>
+				{children}
+			</div>
 		</motion.div>
 	);
 }
