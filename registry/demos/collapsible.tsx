@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 function randomEntry() {
 	return {
-		id: crypto.randomUUID(),
+		id: faker.string.uuid(),
 		name: faker.person.fullName(),
 		account: `${faker.finance.accountName()}`,
 		amount: `${(Math.random()) > 0.5 ? "-" : "+"} ${faker.finance.amount({ min: 5, max: 100, dec: 2, symbol: `${Math.random() > 0.5 ? "€" : "$"}` })}`,
@@ -112,7 +112,7 @@ export function CollapsibleDemo() {
 							</div>
 							<div className="*:text-lg *:text-card-foreground">
 								<span className="font-bold">{item.amount}</span>
-								<span className="font-light">{item.name}</span>
+								<span className="font-light truncate">{item.name}</span>
 							</div>
 						</CollapsibleItem>
 					))}
