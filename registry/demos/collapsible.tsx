@@ -36,7 +36,8 @@ export function CollapsibleDemo() {
 			account: string;
 		}[]
 	>([]);
-	const [open, setOpen] = useState<boolean>(false);
+	const [firstOpen, setFirstOpen] = useState<boolean>(false);
+	const [secondOpen, setSecondOpen] = useState<boolean>(false);
 
 	useEffect(() => {
 		setDemoItems(generateItems(6));
@@ -80,7 +81,7 @@ export function CollapsibleDemo() {
 					Remove Random Item
 				</Button>
 			</div>
-			<Collapsible open={open} onOpenChange={setOpen} gap={8}>
+			<Collapsible open={firstOpen} onOpenChange={setFirstOpen} gap={8}>
 				<CollapsibleTrigger
 					asChild
 					className="z-10 flex flex-row w-[calc(100vw-16px)] sm:w-lg"
@@ -94,7 +95,61 @@ export function CollapsibleDemo() {
 							<CaretUpIcon
 								className={cn(
 									"rounded-full transition-all duration-200 ease-in-out text-foreground",
-									open ? "rotate-z-0" : "rotate-z-180",
+									firstOpen ? "rotate-z-0" : "rotate-z-180",
+								)}
+							/>
+						</span>
+					</Button>
+				</CollapsibleTrigger>
+				<CollapsibleContent>
+					{demoItems.map((item) => (
+						<CollapsibleItem
+							key={item.id}
+							className="flex flex-col *:flex *:flex-row *:gap-1 *:justify-between w-[calc(100vw-16px)] max-w-lg"
+						>
+							<div className="*:text-xs *:font-light *:text-muted-foreground">
+								<span>{item.account}</span>
+								<span>{item.when}</span>
+							</div>
+							<div className="*:text-lg *:text-card-foreground">
+								<span className="font-bold">{item.amount}</span>
+								<span className="font-light truncate">{item.name}</span>
+							</div>
+						</CollapsibleItem>
+					))}
+				</CollapsibleContent>
+			</Collapsible>
+			<div className="flex flex-row gap-2">
+				<Button
+					variant="secondary"
+					className="active:scale-98 duration-75 transition-all ease-out"
+					onClick={addNewItem}
+				>
+					Add Random Item
+				</Button>
+				<Button
+					variant="secondary"
+					className="active:scale-98 duration-75 transition-all ease-out"
+					onClick={removeRandomItem}
+				>
+					Remove Random Item
+				</Button>
+			</div>
+			<Collapsible open={secondOpen} onOpenChange={setSecondOpen} gap={8}>
+				<CollapsibleTrigger
+					asChild
+					className="z-10 flex flex-row w-[calc(100vw-16px)] sm:w-lg"
+				>
+					<Button
+						variant="secondary"
+						className="active:scale-98 duration-75 transition-all ease-out cursor-pointer flex flex-row justify-between rounded-2xl w-full"
+					>
+						<span>Recent Transactions</span>
+						<span>
+							<CaretUpIcon
+								className={cn(
+									"rounded-full transition-all duration-200 ease-in-out text-foreground",
+									secondOpen ? "rotate-z-0" : "rotate-z-180",
 								)}
 							/>
 						</span>

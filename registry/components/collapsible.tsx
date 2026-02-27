@@ -6,6 +6,7 @@ import {
 	AnimatePresence,
 	motion,
 	type TargetAndTransition,
+	useAnimate,
 	useReducedMotion,
 	type VariantLabels,
 } from "motion/react";
@@ -149,25 +150,80 @@ export function CollapsibleContent({
 		maxVisibleItems,
 		clickToOpen,
 		onOpenChange,
+		springConfig,
+		prefersReducedMotion,
 	} = useCollapsibleContext();
+
+	const [scope, animate] = useAnimate<HTMLDivElement>();
+	const hasInitialized = React.useRef(false);
+
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
 	}, [children, setMaxIndex]);
+
+	const targetHeight = calcClosedContentHeight({
+		height: height ?? fallbackHeight,
+		maxIndex,
+		maxVisibleItems,
+		gap,
+		isOpen,
+	});
+
+	React.useLayoutEffect(() => {
+		if (!scope.current) return;
+		if (!hasInitialized.current) {
+			if (targetHeight === "auto") {
+				scope.current.style.height = "auto";
+			} else {
+				scope.current.style.height = `${targetHeight}px`;
+			}
+			hasInitialized.current = true;
+		}
+	}, [scope, targetHeight]);
+
+	React.useEffect(() => {
+		if (!scope.current || !hasInitialized.current) return;
+
+		if (targetHeight === "auto") {
+			const currentHeight = scope.current.getBoundingClientRect().height;
+			const scrollHeight = scope.current.scrollHeight;
+
+			if (currentHeight === scrollHeight) {
+				scope.current.style.height = "auto";
+				return;
+			}
+
+			scope.current.style.height = `${currentHeight}px`;
+
+			animate(
+				scope.current,
+				{ height: scrollHeight },
+				prefersReducedMotion
+					? { duration: 0 }
+					: { type: "spring", ...springConfig },
+			).then(() => {
+				if (scope.current) scope.current.style.height = "auto";
+			});
+		} else {
+			animate(
+				scope.current,
+				{ height: targetHeight },
+				prefersReducedMotion
+					? { duration: 0 }
+					: { type: "spring", ...springConfig },
+			);
+		}
+	}, [targetHeight, animate, scope, springConfig, prefersReducedMotion]);
 
 	const childArray = React.Children.toArray(children);
 
 	return (
 		<CollapsiblePrimitive.Content
+			ref={scope}
 			className={cn("m-2 flex flex-col", className)}
 			style={{
 				gap: `${gap}px`,
-				height: calcClosedContentHeight({
-					height: height ?? fallbackHeight,
-					maxIndex,
-					maxVisibleItems,
-					gap,
-					isOpen,
-				}),
+				overflow: "hidden",
 			}}
 			onClick={() => {
 				clickToOpen && !isOpen && onOpenChange(true);
