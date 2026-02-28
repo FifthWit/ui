@@ -223,7 +223,6 @@ export function CollapsibleContent({
 			className={cn("m-2 flex flex-col", className)}
 			style={{
 				gap: `${gap}px`,
-				overflow: "hidden",
 			}}
 			onClick={() => {
 				clickToOpen && !isOpen && onOpenChange(true);
