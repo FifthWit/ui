@@ -41,6 +41,7 @@ type CollapsibleCustomizations = {
 	maxVisibleItems?: number;
 	/** gap in px between cards. Do not manually set with CSS @default 8 */
 	gap?: number;
+	/** amount to scale elements down by per item when collapsed @default 0.05s */
 	scaleStep?: number;
 	springConfig?: { duration?: number; bounce?: number };
 	fallbackHeight?: number;
@@ -103,10 +104,15 @@ export function Collapsible({
 export function CollapsibleTrigger({
 	asChild = false,
 	children,
+	className,
 	...props
 }: CollapsiblePrimitive.CollapsibleTriggerProps) {
 	return (
-		<CollapsiblePrimitive.Trigger asChild={asChild} {...props}>
+		<CollapsiblePrimitive.Trigger
+			asChild={asChild}
+			className={cn("cursor-pointer", className)}
+			{...props}
+		>
 			{children}
 		</CollapsiblePrimitive.Trigger>
 	);
@@ -152,6 +158,7 @@ export function CollapsibleContent({
 		onOpenChange,
 		springConfig,
 		prefersReducedMotion,
+		setHeight,
 	} = useCollapsibleContext();
 
 	const [scope, animate] = useAnimate<HTMLDivElement>();
@@ -160,6 +167,12 @@ export function CollapsibleContent({
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
 	}, [children, setMaxIndex]);
+
+	React.useEffect(() => {
+		if (maxIndex === 0) {
+			setHeight(0);
+		}
+	}, [maxIndex, setHeight]);
 
 	const targetHeight = calcClosedContentHeight({
 		height: height ?? fallbackHeight,
