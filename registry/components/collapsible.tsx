@@ -380,6 +380,7 @@ export function CollapsibleItem({
 	return (
 		<motion.div
 			layout={!prefersReducedMotion}
+			layoutDependency={`${maxIndex}-${isOpen}-${height}`}
 			animate={calcItemAnimate(animationPropsBase)}
 			initial={calcItemInitial(animationPropsBase)}
 			exit={calcItemExit(animationPropsBase)}

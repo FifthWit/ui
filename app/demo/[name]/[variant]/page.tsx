@@ -8,6 +8,7 @@ import { StatefulBadgeDemo } from "@/registry/demos/stateful-badge";
 import {
 	CollapsibleDemo,
 	CollapsibleDevsDemo,
+	CollapsibleNotificiationsDemo,
 } from "@/registry/demos/collapsible";
 
 type DemoMap = Record<
@@ -22,6 +23,7 @@ export const demos: DemoMap = {
 	collapsible: {
 		default: CollapsibleDemo,
 		devs: CollapsibleDevsDemo,
+		notifications: CollapsibleNotificiationsDemo,
 	},
 };
 

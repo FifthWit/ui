@@ -15,15 +15,9 @@ import {
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-	Popover,
-	PopoverContent,
-	PopoverDescription,
-	PopoverHeader,
-	PopoverTitle,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function randomEntry() {
 	return {
@@ -250,6 +244,89 @@ export function CollapsibleDevsDemo() {
 						</CollapsibleContent>
 					</div>
 				</div>
+			</Collapsible>
+		</div>
+	);
+}
+
+export function CollapsibleNotificiationsDemo() {
+	const [open, setOpen] = useState(false);
+
+	const comments: {
+		name: string;
+		pfp: string;
+		comment: string;
+	}[] = [
+		{
+			name: "Next.js",
+			pfp: "https://github.com/nextjs.png",
+			comment: "SSR + DX should be at the cost of using Vercel",
+		},
+		{
+			name: "TypeScript",
+			pfp: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Typescript.svg/1280px-Typescript.svg.png",
+			comment: "TypeScript > JSDoc",
+		},
+		{
+			name: "React.js",
+			pfp: "https://github.com/reactjs.png",
+			comment: "We're a library, not a framework!!!!!!",
+		},
+		{
+			name: "TailwindCSS",
+			pfp: "https://github.com/tailwindlabs.png",
+			comment:
+				"If anyone is a recovering Tailwind addict, there is no hope, keep using it.",
+		},
+		{
+			name: "Radix-UI",
+			pfp: "https://github.com/radix-ui.png",
+			comment: "Primitives are the way",
+		},
+		{
+			name: "Fumadocs",
+			pfp: "https://www.fumadocs.dev/icon.png?icon.f741d7a1.png",
+			comment: "MDX is life.",
+		},
+	];
+
+	return (
+		<div className="flex flex-col bg-card p-4 rounded-lg w-sm aspect-3/4">
+			<Collapsible open={open} onOpenChange={setOpen}>
+				<CollapsibleTrigger
+					className="flex flex-row justify-center items-center gap-1 w-fit min-h-12"
+					asChild
+				>
+					<Button variant="ghost">
+						ReactCord
+						<span
+							aria-hidden
+							data-open={open}
+							className="bg-accent p-1 rounded-full aspect-square text-accent-foreground flex data-open:-rotate-180 transition-all"
+						>
+							<CaretDownIcon />
+						</span>
+					</Button>
+				</CollapsibleTrigger>
+				<ScrollArea className="h-100">
+					<CollapsibleContent>
+						{comments.map((c) => (
+							<CollapsibleItem
+								key={c.name}
+								className="flex flex-row items-center gap-2"
+							>
+								<Avatar>
+									<AvatarImage src={c.pfp} />
+									<AvatarFallback>{c.name}</AvatarFallback>
+								</Avatar>
+								<div className="w-full flex flex-col">
+									<p className="text-xs text-muted-foreground">{c.name}</p>
+									<p className="text-sm">{c.comment}</p>
+								</div>
+							</CollapsibleItem>
+						))}
+					</CollapsibleContent>
+				</ScrollArea>
 			</Collapsible>
 		</div>
 	);
