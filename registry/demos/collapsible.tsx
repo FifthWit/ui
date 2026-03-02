@@ -8,9 +8,22 @@ import {
 	CollapsibleItem,
 	CollapsibleTrigger,
 } from "../components/collapsible";
-import { CaretUpIcon } from "@phosphor-icons/react";
+import {
+	CaretDownIcon,
+	CaretUpIcon,
+	GithubLogoIcon,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+	Popover,
+	PopoverContent,
+	PopoverDescription,
+	PopoverHeader,
+	PopoverTitle,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function randomEntry() {
 	return {
@@ -177,6 +190,67 @@ export function CollapsibleDemo() {
 	);
 }
 
-export function CollapsibleSidebarDemo() {
-	return <div>Hello world</div>;
+export function CollapsibleDevsDemo() {
+	const [open, setOpen] = useState(false);
+
+	const comments: { name: string; pfp: string; link: string }[] = [
+		{
+			name: "Pasithea",
+			pfp: "https://github.com/Pasithea0.png",
+			link: "https://github.com/Pasithea0",
+		},
+		{
+			name: "FifthWit",
+			pfp: "https://github.com/FifthWit.png",
+			link: "https://github.com/FifthWit",
+		},
+		{
+			name: "shadcn",
+			pfp: "https://github.com/shadcn.png",
+			link: "https://github.com/shadcn",
+		},
+	];
+
+	return (
+		<div className="flex flex-col h-screen max-h-80">
+			<Collapsible open={open} onOpenChange={setOpen}>
+				<div className="flex flex-col items-center w-full">
+					<CollapsibleTrigger
+						className="flex flex-row justify-center items-center gap-1 w-fit min-h-12"
+						asChild
+					>
+						<Button variant="ghost">
+							Cool Developers
+							<span
+								aria-hidden
+								data-open={open}
+								className="bg-accent p-1 rounded-full aspect-square text-accent-foreground flex data-open:-rotate-180 transition-all"
+							>
+								<CaretDownIcon />
+							</span>
+						</Button>
+					</CollapsibleTrigger>
+					<div className="w-full">
+						<CollapsibleContent>
+							{comments.map((c) => (
+								<CollapsibleItem
+									key={c.name}
+									className="flex flex-row gap-2 items-center"
+								>
+									<Avatar>
+										<AvatarImage src={c.pfp} />
+										<AvatarFallback>{c.name}</AvatarFallback>
+									</Avatar>
+									<h2>{c.name}</h2>
+									<Button variant="ghost" onClick={() => window.open(c.link)}>
+										<GithubLogoIcon />
+									</Button>
+								</CollapsibleItem>
+							))}
+						</CollapsibleContent>
+					</div>
+				</div>
+			</Collapsible>
+		</div>
+	);
 }

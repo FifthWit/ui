@@ -244,14 +244,20 @@ export function CollapsibleContent({
 			{...props}
 		>
 			<AnimatePresence mode="popLayout" initial={false}>
-				{childArray.map((child, index) =>
-					React.isValidElement(child)
+				{childArray.map((child, index) => {
+					const isCollapsibleItem =
+						React.isValidElement(child) &&
+						(child.type === CollapsibleItem ||
+							(typeof child.type === "function" &&
+								"displayName" in child.type &&
+								child.type.displayName === "CollapsibleItem"));
+					return isCollapsibleItem
 						? React.cloneElement(
 								child as React.ReactElement<CollapsibleItemProps>,
 								{ index },
 							)
-						: child,
-				)}
+						: child;
+				})}
 			</AnimatePresence>
 		</CollapsiblePrimitive.Content>
 	);
@@ -339,15 +345,28 @@ export function CollapsibleItem({
 		springConfig,
 		maxIndex,
 		prefersReducedMotion,
+		clickToOpen,
 	} = useCollapsibleContext();
 
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
 	const closedHeight = height ?? fallbackHeight;
 
-	React.useEffect(() => {
-		if (internalRef.current && index === 0) {
-			setHeight(internalRef.current.clientHeight);
-		}
+	React.useLayoutEffect(() => {
+		if (index !== 0 || !internalRef.current) return;
+
+		setHeight(internalRef.current.clientHeight);
+
+		const observer = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const h =
+					entry.borderBoxSize?.[0]?.blockSize ?? entry.target.clientHeight;
+				if (h > 0) {
+					setHeight(h);
+				}
+			}
+		});
+		observer.observe(internalRef.current);
+		return () => observer.disconnect();
 	}, [index, setHeight]);
 
 	const animationPropsBase = {
@@ -380,14 +399,22 @@ export function CollapsibleItem({
 				ref={internalRef}
 				aria-hidden={!(isOpen || !(index > 0))}
 				className={cn(
-					"flex bg-card rounded-2xl p-4 shadow-sm ring ring-border ring-inset", // Ring is needed since border offsets, then breaks the CollapsibleContent sizing calculations.
+					"flex bg-card rounded-2xl p-4 shadow-sm ring ring-border ring-inset",
 					className,
 				)}
+				style={{
+					...(!isOpen && index !== 0
+						? { height: height ?? fallbackHeight }
+						: {}),
+					...(clickToOpen && !isOpen ? { pointerEvents: "none" as const } : {}),
+				}}
 			>
 				{children}
 			</div>
 		</motion.div>
 	);
 }
+
+CollapsibleItem.displayName = "CollapsibleItem";
 
 export { useCollapsibleContext };

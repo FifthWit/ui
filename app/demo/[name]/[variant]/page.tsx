@@ -7,7 +7,7 @@ import { SlidingMenuDemo } from "@/registry/demos/sliding-menu";
 import { StatefulBadgeDemo } from "@/registry/demos/stateful-badge";
 import {
 	CollapsibleDemo,
-	CollapsibleSidebarDemo,
+	CollapsibleDevsDemo,
 } from "@/registry/demos/collapsible";
 
 type DemoMap = Record<
@@ -15,13 +15,13 @@ type DemoMap = Record<
 	Record<string, React.ComponentType> | React.ComponentType
 >;
 
-const demos: DemoMap = {
+export const demos: DemoMap = {
 	"sliding-menu": SlidingMenuDemo,
 	"github-hover-card": GhCardDemo,
 	"stateful-badge": StatefulBadgeDemo,
 	collapsible: {
 		default: CollapsibleDemo,
-		sidebar: CollapsibleSidebarDemo,
+		devs: CollapsibleDevsDemo,
 	},
 };
 

@@ -1,28 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
-import { GhCardDemo } from "@/registry/demos/github-hover-card";
-import { SlidingMenuDemo } from "@/registry/demos/sliding-menu";
-import { StatefulBadgeDemo } from "@/registry/demos/stateful-badge";
-import {
-	CollapsibleDemo,
-	CollapsibleSidebarDemo,
-} from "@/registry/demos/collapsible";
-
-type DemoMap = Record<
-	string,
-	Record<string, React.ComponentType> | React.ComponentType
->;
-
-const demos: DemoMap = {
-	"sliding-menu": SlidingMenuDemo,
-	"github-hover-card": GhCardDemo,
-	"stateful-badge": StatefulBadgeDemo,
-	collapsible: {
-		default: CollapsibleDemo,
-		sidebar: CollapsibleSidebarDemo,
-	},
-};
+import { demos } from "@/app/demo/[name]/[variant]/page";
 
 export default function DemoPage() {
 	const { name, variant } = useParams() as { name: string; variant: string };
@@ -33,11 +12,9 @@ export default function DemoPage() {
 	let Demo: React.ComponentType;
 
 	if (typeof demoEntry === "function") {
-		// Single-component demo: only allow "default" as variant
 		if (variant !== "default") notFound();
 		Demo = demoEntry;
 	} else {
-		// Multi-variant demo: look up requested variant
 		const resolved = demoEntry[variant];
 		if (!resolved) notFound();
 		Demo = resolved;
