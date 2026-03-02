@@ -18,6 +18,17 @@ export async function GET(
 			title={page.data.title}
 			description={page.data.description}
 			site="fifth/ui"
+			icon={
+				<img
+					src="https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/app/favicon.ico"
+					width={80}
+					height={80}
+					style={{ borderRadius: 40 }}
+					alt=""
+				/>
+			}
+			primaryColor="#602B4C"
+			primaryTextColor="#f049f5"
 		/>,
 		{
 			width: 1200,
