@@ -7,7 +7,7 @@ import {
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { source } from "@/lib/source";
+import { source, getPageImage } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
@@ -47,5 +47,8 @@ export async function generateMetadata(
 	return {
 		title: page.data.title,
 		description: page.data.description,
+		openGraph: {
+			images: getPageImage(page).url,
+		},
 	};
 }
