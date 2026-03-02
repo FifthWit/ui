@@ -1,9 +1,31 @@
 "use client";
+
 import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
-import { demos } from "@/app/demo/[name]/[variant]/page";
+import { GhCardDemo } from "@/registry/demos/github-hover-card";
+import { SlidingMenuDemo } from "@/registry/demos/sliding-menu";
+import { StatefulBadgeDemo } from "@/registry/demos/stateful-badge";
+import {
+	CollapsibleDemo,
+	CollapsibleDevsDemo,
+} from "@/registry/demos/collapsible";
 
-export default function DemoPage() {
+type DemoMap = Record<
+	string,
+	Record<string, React.ComponentType> | React.ComponentType
+>;
+
+export const demos: DemoMap = {
+	"sliding-menu": SlidingMenuDemo,
+	"github-hover-card": GhCardDemo,
+	"stateful-badge": StatefulBadgeDemo,
+	collapsible: {
+		default: CollapsibleDemo,
+		devs: CollapsibleDevsDemo,
+	},
+};
+
+export default function DemoVariantPage() {
 	const { name, variant } = useParams() as { name: string; variant: string };
 
 	const demoEntry = demos[name];

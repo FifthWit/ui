@@ -2,7 +2,14 @@
 
 import React from "react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import {
+	AnimatePresence,
+	motion,
+	type TargetAndTransition,
+	useAnimate,
+	useReducedMotion,
+	type VariantLabels,
+} from "motion/react";
 import { cn } from "@/lib/utils";
 
 type CollapsibleContextType = {
@@ -34,9 +41,11 @@ type CollapsibleCustomizations = {
 	maxVisibleItems?: number;
 	/** gap in px between cards. Do not manually set with CSS @default 8 */
 	gap?: number;
+	/** amount to scale elements down by per item when collapsed @default 0.05s */
 	scaleStep?: number;
 	springConfig?: { duration?: number; bounce?: number };
 	fallbackHeight?: number;
+	clickToOpen?: boolean;
 };
 
 const DEFAULT_SPRING = { duration: 0.2, bounce: 0.1 } as const;
@@ -52,6 +61,7 @@ export function Collapsible({
 	springConfig = DEFAULT_SPRING,
 	fallbackHeight = 90,
 	gap = 8,
+	clickToOpen = true,
 	...props
 }: CollapsiblePrimitive.CollapsibleProps &
 	CollapsibleCustomizations & {
@@ -76,6 +86,7 @@ export function Collapsible({
 				fallbackHeight,
 				onOpenChange: onOpenChange ?? (() => {}),
 				gap,
+				clickToOpen,
 			}}
 		>
 			<CollapsiblePrimitive.Root
@@ -93,12 +104,38 @@ export function Collapsible({
 export function CollapsibleTrigger({
 	asChild = false,
 	children,
+	className,
 	...props
 }: CollapsiblePrimitive.CollapsibleTriggerProps) {
 	return (
-		<CollapsiblePrimitive.Trigger asChild={asChild} {...props}>
+		<CollapsiblePrimitive.Trigger
+			asChild={asChild}
+			className={cn("cursor-pointer", className)}
+			{...props}
+		>
 			{children}
 		</CollapsiblePrimitive.Trigger>
+	);
+}
+
+function calcClosedContentHeight({
+	height,
+	maxIndex,
+	maxVisibleItems,
+	gap,
+	isOpen,
+}: {
+	height: number;
+	maxIndex: number;
+	maxVisibleItems: number;
+	gap: number;
+	isOpen: boolean;
+}): number | "auto" {
+	if (isOpen) return "auto";
+
+	return (
+		height +
+		gap * ((maxIndex < maxVisibleItems ? maxIndex : maxVisibleItems) - 1)
 	);
 }
 
@@ -117,40 +154,110 @@ export function CollapsibleContent({
 		gap,
 		fallbackHeight,
 		maxVisibleItems,
+		clickToOpen,
+		onOpenChange,
+		springConfig,
+		prefersReducedMotion,
+		setHeight,
 	} = useCollapsibleContext();
+
+	const [scope, animate] = useAnimate<HTMLDivElement>();
+	const hasInitialized = React.useRef(false);
+
 	React.useEffect(() => {
 		setMaxIndex(React.Children.count(children));
 	}, [children, setMaxIndex]);
+
+	React.useEffect(() => {
+		if (maxIndex === 0) {
+			setHeight(0);
+		}
+	}, [maxIndex, setHeight]);
+
+	const targetHeight = calcClosedContentHeight({
+		height: height ?? fallbackHeight,
+		maxIndex,
+		maxVisibleItems,
+		gap,
+		isOpen,
+	});
+
+	React.useLayoutEffect(() => {
+		if (!scope.current) return;
+		if (!hasInitialized.current) {
+			if (targetHeight === "auto") {
+				scope.current.style.height = "auto";
+			} else {
+				scope.current.style.height = `${targetHeight}px`;
+			}
+			hasInitialized.current = true;
+		}
+	}, [scope, targetHeight]);
+
+	React.useEffect(() => {
+		if (!scope.current || !hasInitialized.current) return;
+
+		if (targetHeight === "auto") {
+			const currentHeight = scope.current.getBoundingClientRect().height;
+			const scrollHeight = scope.current.scrollHeight;
+
+			if (currentHeight === scrollHeight) {
+				scope.current.style.height = "auto";
+				return;
+			}
+
+			scope.current.style.height = `${currentHeight}px`;
+
+			animate(
+				scope.current,
+				{ height: scrollHeight },
+				prefersReducedMotion
+					? { duration: 0 }
+					: { type: "spring", ...springConfig },
+			).then(() => {
+				if (scope.current) scope.current.style.height = "auto";
+			});
+		} else {
+			animate(
+				scope.current,
+				{ height: targetHeight },
+				prefersReducedMotion
+					? { duration: 0 }
+					: { type: "spring", ...springConfig },
+			);
+		}
+	}, [targetHeight, animate, scope, springConfig, prefersReducedMotion]);
 
 	const childArray = React.Children.toArray(children);
 
 	return (
 		<CollapsiblePrimitive.Content
+			ref={scope}
 			className={cn("m-2 flex flex-col", className)}
 			style={{
 				gap: `${gap}px`,
-				...(isOpen
-					? { height: "auto" }
-					: {
-							height:
-								(height == null ? fallbackHeight : height) +
-								gap *
-									((maxIndex < maxVisibleItems ? maxIndex : maxVisibleItems) -
-										1),
-						}),
+			}}
+			onClick={() => {
+				clickToOpen && !isOpen && onOpenChange(true);
 			}}
 			forceMount
 			{...props}
 		>
 			<AnimatePresence mode="popLayout" initial={false}>
-				{childArray.map((child, index) =>
-					React.isValidElement(child)
+				{childArray.map((child, index) => {
+					const isCollapsibleItem =
+						React.isValidElement(child) &&
+						(child.type === CollapsibleItem ||
+							(typeof child.type === "function" &&
+								"displayName" in child.type &&
+								child.type.displayName === "CollapsibleItem"));
+					return isCollapsibleItem
 						? React.cloneElement(
 								child as React.ReactElement<CollapsibleItemProps>,
 								{ index },
 							)
-						: child,
-				)}
+						: child;
+				})}
 			</AnimatePresence>
 		</CollapsiblePrimitive.Content>
 	);
@@ -163,6 +270,64 @@ export type CollapsibleItemProps = Omit<
 	index?: number;
 	children: React.ReactNode;
 };
+
+interface CalcItemBase {
+	prefersReducedMotion: boolean;
+	isOpen: boolean;
+	index: number;
+	scaleStep: number;
+	closedHeight: number;
+	maxVisibleItems: number;
+}
+
+function calcItemAnimate({
+	prefersReducedMotion,
+	isOpen,
+	index,
+	scaleStep,
+	closedHeight,
+	maxVisibleItems,
+}: CalcItemBase): TargetAndTransition | VariantLabels | boolean {
+	if (prefersReducedMotion) return { opacity: isOpen || index === 0 ? 1 : 0 };
+	else if (isOpen) return { scale: 1, y: 0, opacity: 1 };
+
+	return {
+		scale: 1 - scaleStep * index,
+		y: 0 - index * closedHeight + (closedHeight * (scaleStep * index)) / 2,
+		opacity: index > maxVisibleItems - 1 ? 0 : 1,
+	};
+}
+
+function calcItemInitial({
+	prefersReducedMotion,
+	isOpen,
+	index,
+	closedHeight,
+	maxVisibleItems,
+}: CalcItemBase): TargetAndTransition | VariantLabels | boolean {
+	if (prefersReducedMotion) return false;
+	else if (!isOpen && index < maxVisibleItems)
+		return {
+			...DEFAULT_SCALE_ANIMATION,
+			y: 0 - index * closedHeight - closedHeight / 2,
+		};
+	return isOpen ? { scale: 0.8, opacity: 0.6, y: -20 } : false;
+}
+
+function calcItemExit({
+	prefersReducedMotion,
+	isOpen,
+	index,
+	closedHeight,
+}: CalcItemBase): TargetAndTransition | VariantLabels | undefined {
+	if (prefersReducedMotion) return undefined;
+	return {
+		...DEFAULT_SCALE_ANIMATION,
+		y: isOpen ? -20 : -index * closedHeight - 20,
+	};
+}
+
+const DEFAULT_SCALE_ANIMATION = { scale: 0.8, opacity: 0 } as const;
 
 export function CollapsibleItem({
 	children,
@@ -180,65 +345,44 @@ export function CollapsibleItem({
 		springConfig,
 		maxIndex,
 		prefersReducedMotion,
+		clickToOpen,
 	} = useCollapsibleContext();
 
 	const internalRef = React.useRef<HTMLDivElement | null>(null);
 	const closedHeight = height ?? fallbackHeight;
 
-	React.useEffect(() => {
-		if (internalRef.current && index === 0) {
-			setHeight(internalRef.current.clientHeight);
-		}
+	React.useLayoutEffect(() => {
+		if (index !== 0 || !internalRef.current) return;
+
+		setHeight(internalRef.current.clientHeight);
+
+		const observer = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const h =
+					entry.borderBoxSize?.[0]?.blockSize ?? entry.target.clientHeight;
+				if (h > 0) {
+					setHeight(h);
+				}
+			}
+		});
+		observer.observe(internalRef.current);
+		return () => observer.disconnect();
 	}, [index, setHeight]);
-	const defaultScaleAnimation = {
-		scale: 0.8,
-		opacity: 0,
+
+	const animationPropsBase = {
+		prefersReducedMotion,
+		isOpen,
+		index,
+		scaleStep,
+		closedHeight,
+		maxVisibleItems,
 	};
 	return (
 		<motion.div
 			layout={!prefersReducedMotion}
-			animate={
-				prefersReducedMotion
-					? {
-							opacity: isOpen || index === 0 ? 1 : 0,
-						}
-					: isOpen
-						? { scale: 1, y: 0, opacity: 1 }
-						: {
-								scale: 1 - scaleStep * index,
-								// needed to keep uniform stacking distance regardless of the height, the first part places the divs all on top of each other with only the gap from padding moving them,
-								// but with large heights the parallax-esque scale effect can actually hide it under the top item, so we take its height,
-								// and multiply it by scaleStep*index which gives us the value of the height it loses,
-								// then we offset it by that value/2 to push it down again regardless of height.
-								y:
-									0 -
-									index * closedHeight +
-									(closedHeight * (scaleStep * index)) / 2,
-								opacity: index > maxVisibleItems - 1 ? 0 : 1,
-							}
-			}
-			initial={
-				prefersReducedMotion
-					? false
-					: !isOpen && index < maxVisibleItems
-						? {
-								...defaultScaleAnimation,
-								y: 0 - index * closedHeight - closedHeight / 2,
-							}
-						: isOpen
-							? { scale: 0.8, opacity: 0.6, y: -20 }
-							: false
-			}
-			exit={
-				prefersReducedMotion
-					? undefined
-					: isOpen
-						? { ...defaultScaleAnimation, y: -20 }
-						: {
-								...defaultScaleAnimation,
-								y: 0 - index * closedHeight - 20,
-							}
-			}
+			animate={calcItemAnimate(animationPropsBase)}
+			initial={calcItemInitial(animationPropsBase)}
+			exit={calcItemExit(animationPropsBase)}
 			style={{ zIndex: maxIndex - index, ...props.style }}
 			transition={{
 				type: "spring",
@@ -255,14 +399,22 @@ export function CollapsibleItem({
 				ref={internalRef}
 				aria-hidden={!(isOpen || !(index > 0))}
 				className={cn(
-					"flex bg-card rounded-2xl p-4 shadow-sm ring ring-border ring-inset", // Ring is needed since border offsets, then breaks the CollapsibleContent sizing calculations.
+					"flex bg-card rounded-2xl p-4 shadow-sm ring ring-border ring-inset",
 					className,
 				)}
+				style={{
+					...(!isOpen && index !== 0
+						? { height: height ?? fallbackHeight }
+						: {}),
+					...(clickToOpen && !isOpen ? { pointerEvents: "none" as const } : {}),
+				}}
 			>
 				{children}
 			</div>
 		</motion.div>
 	);
 }
+
+CollapsibleItem.displayName = "CollapsibleItem";
 
 export { useCollapsibleContext };
