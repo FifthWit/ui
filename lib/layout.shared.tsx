@@ -5,5 +5,6 @@ export function baseOptions(): BaseLayoutProps {
 		nav: {
 			title: "fifth/ui",
 		},
+		githubUrl: "https://github.com/FifthWit/ui",
 	};
 }

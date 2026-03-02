@@ -1,0 +1,331 @@
+---
+title: "Collapsible"
+description: "Customizable animated collapsible element using Framer Motion + Radix-UI"
+---
+
+import { ComponentPreview } from '@/components/component-preview';
+
+<Tabs items={["Preview", "Code"]}>
+  <Tab><ComponentPreview name="collapsible" variant="devs" /></Tab>
+  <Tab>
+```tsx
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleItem,
+	CollapsibleTrigger,
+} from "@/components/collapsible";
+
+import {
+	CaretDownIcon,
+	GithubLogoIcon,
+} from "@phosphor-icons/react";
+
+export function CollapsibleDevsDemo() {
+	const [open, setOpen] = useState(false);
+
+	const comments: { name: string; pfp: string; link: string }[] = [
+		{
+			name: "Pasithea",
+			pfp: "https://github.com/Pasithea0.png",
+			link: "https://github.com/Pasithea0",
+		},
+		{
+			name: "FifthWit",
+			pfp: "https://github.com/FifthWit.png",
+			link: "https://github.com/FifthWit",
+		},
+		{
+			name: "shadcn",
+			pfp: "https://github.com/shadcn.png",
+			link: "https://github.com/shadcn",
+		},
+	];
+
+	return (
+		<div className="flex flex-col h-screen max-h-80">
+			<Collapsible open={open} onOpenChange={setOpen}>
+				<div className="flex flex-col items-center w-full">
+					<CollapsibleTrigger
+						className="flex flex-row justify-center items-center gap-1 w-fit min-h-12"
+						asChild
+					>
+						<Button variant="ghost">
+							Cool Developers
+							<span
+								aria-hidden
+								data-open={open}
+								className="bg-accent p-1 rounded-full aspect-square text-accent-foreground flex data-open:-rotate-180 transition-all"
+							>
+								<CaretDownIcon />
+							</span>
+						</Button>
+					</CollapsibleTrigger>
+					<div className="w-full">
+						<CollapsibleContent>
+							{comments.map((c) => (
+								<CollapsibleItem
+									key={c.name}
+									className="flex flex-row gap-2 items-center"
+								>
+									<Avatar>
+										<AvatarImage src={c.pfp} />
+										<AvatarFallback>{c.name}</AvatarFallback>
+									</Avatar>
+									<h2>{c.name}</h2>
+									<Button variant="ghost" onClick={() => window.open(c.link)}>
+										<GithubLogoIcon />
+									</Button>
+								</CollapsibleItem>
+							))}
+						</CollapsibleContent>
+					</div>
+				</div>
+			</Collapsible>
+		</div>
+	);
+}
+```
+  </Tab>
+</Tabs>
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'deno', 'bun']}>
+    <Tab>
+```bash
+npx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/collapsible.json
+```
+    </Tab>
+    <Tab>
+```bash
+pnpm dlx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/collapsible.json
+```
+    </Tab>
+    <Tab>
+```bash
+deno run -A npm:shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/collapsible.json
+```
+    </Tab>
+    <Tab>
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/collapsible.json
+```
+    </Tab>
+</Tabs>
+
+## Anatomy
+
+```tsx
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleItem,
+	CollapsibleTrigger,
+} from "@/components/collapsible";
+
+export default () => (
+  <Collapsible>
+    <CollapsibleTrigger></CollapsibleTrigger>
+    <CollapsibleContent>
+      <CollapsibleItem></CollapsibleItem>
+    </CollapsibleContent>
+  </Collapsible>
+)
+```
+
+## Examples
+### Scroll Area
+wrapping collapsible in the shadcn ScrollArea
+<Tabs items={["Preview", "Code"]}>
+  <Tab><ComponentPreview name="collapsible" variant="notifications" /></Tab>
+  <Tab>
+```tsx
+export function CollapsibleNotificiationsDemo() {
+	const [open, setOpen] = useState(false);
+
+	const comments: {
+		name: string;
+		pfp: string;
+		comment: string;
+	}[] = [
+		{
+			name: "Next.js",
+			pfp: "https://github.com/nextjs.png",
+			comment: "SSR + DX should be at the cost of using Vercel",
+		},
+		{
+			name: "TypeScript",
+			pfp: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Typescript.svg/1280px-Typescript.svg.png",
+			comment: "TypeScript > JSDoc",
+		},
+		{
+			name: "React.js",
+			pfp: "https://github.com/reactjs.png",
+			comment: "We're a library, not a framework!!!!!!",
+		},
+		{
+			name: "TailwindCSS",
+			pfp: "https://github.com/tailwindlabs.png",
+			comment:
+				"If anyone is a recovering Tailwind addict, there is no hope, keep using it.",
+		},
+		{
+			name: "Radix-UI",
+			pfp: "https://github.com/radix-ui.png",
+			comment: "Primitives are the way",
+		},
+		{
+			name: "Fumadocs",
+			pfp: "https://www.fumadocs.dev/icon.png?icon.f741d7a1.png",
+			comment: "MDX is life.",
+		},
+	];
+
+	return (
+		<div className="flex flex-col bg-card p-4 rounded-lg w-sm aspect-3/4">
+			<Collapsible open={open} onOpenChange={setOpen}>
+				<CollapsibleTrigger
+					className="flex flex-row justify-center items-center gap-1 w-fit min-h-12"
+					asChild
+				>
+					<Button variant="ghost">
+						ReactCord
+						<span
+							aria-hidden
+							data-open={open}
+							className="bg-accent p-1 rounded-full aspect-square text-accent-foreground flex data-open:-rotate-180 transition-all"
+						>
+							<CaretDownIcon />
+						</span>
+					</Button>
+				</CollapsibleTrigger>
+				<ScrollArea className="h-100">
+					<CollapsibleContent>
+						{comments.map((c) => (
+							<CollapsibleItem
+								key={c.name}
+								className="flex flex-row items-center gap-2"
+							>
+								<Avatar>
+									<AvatarImage src={c.pfp} />
+									<AvatarFallback>{c.name}</AvatarFallback>
+								</Avatar>
+								<div className="w-full flex flex-col">
+									<p className="text-xs text-muted-foreground">{c.name}</p>
+									<p className="text-sm">{c.comment}</p>
+								</div>
+							</CollapsibleItem>
+						))}
+					</CollapsibleContent>
+				</ScrollArea>
+			</Collapsible>
+		</div>
+	);
+}
+```
+  </Tab>
+</Tabs>
+
+
+## Props
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+### `<Collapsible />`
+<TypeTable
+  type={{
+    className: {
+      description: 'classes to add',
+      type: 'string',
+      default: "",
+    },
+    ref: {
+      description: 'custom ref for the `<Collapsible />`',
+      type: "Ref",
+      default: "null"
+    },
+    open: {
+      description: "state of the collapsible",
+      type: "Boolean",
+      required: true
+    },
+    onOpenChange: {
+      description: "Function that changes the state, i.e. `setOpen`",
+      type: "function",
+      required: true,
+    },
+    maxVisibleItems: {
+      description: "The maximum number of elements visible when the Collapsible is closed",
+      type: "number",
+      default: 4
+    },
+    scaleStep: {
+      description: "How much to scale each item down by when in a closed state",
+      type: "number",
+      default: 0.05
+    },
+    SPRING_CONFIG: {
+      description: "duration and bounce for the items animations.",
+      type: "object",
+      default: `{ duration: 0.2, bounce: 0.1 }`
+    },
+    fallbackHeight: {
+      description: "height to default to when there is no height value",
+      type: "number",
+      default: 90
+    },
+    gap: {
+      description: "gap between items in px, this is needed because of the stacking animation",
+      type: "number",
+      default: 8
+    },
+    clickToOpen: {
+      description: "decides if the collapsible should open on click, good for mobile",
+      type: "boolean",
+      default: true
+    }
+  }}
+/>
+
+### `<CollapsibleTrigger />`
+<TypeTable type={{
+  asChild: {
+    type: "boolean",
+    default: false
+  },
+  className: {
+    type: "string",
+    default: undefined
+  },
+  children: {
+    type: "React.ReactNode",
+    required: true,
+    default: undefined
+  }
+}} />
+
+### `<CollapsibleContent />`
+<TypeTable type={{
+  className: {
+    type: "string | undefined",
+    default: undefined
+  },
+  children: {
+    type: "React.ReactNode",
+    required: true,
+    default: undefined
+  }
+}} />
+
+### `<CollapsibleItem />`
+<TypeTable type={{
+  children: {
+    type: "React.ReactNode",
+    required: true,
+    default: undefined
+  },
+  className: {
+    type: "string | undefined",
+    default: undefined
+  }
+}} />
