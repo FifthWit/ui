@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { GhCardDemo } from "@/registry/demos/github-hover-card";
@@ -24,7 +25,7 @@ const demos: DemoMap = {
 	},
 };
 
-export default function DemoPage() {
+export default function DemoVariantPage() {
 	const { name, variant } = useParams() as { name: string; variant: string };
 
 	const demoEntry = demos[name];
@@ -33,11 +34,9 @@ export default function DemoPage() {
 	let Demo: React.ComponentType;
 
 	if (typeof demoEntry === "function") {
-		// Single-component demo: only allow "default" as variant
 		if (variant !== "default") notFound();
 		Demo = demoEntry;
 	} else {
-		// Multi-variant demo: look up requested variant
 		const resolved = demoEntry[variant];
 		if (!resolved) notFound();
 		Demo = resolved;

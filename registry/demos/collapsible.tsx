@@ -176,3 +176,7 @@ export function CollapsibleDemo() {
 		</div>
 	);
 }
+
+export function CollapsibleSidebarDemo() {
+	return <div>Hello world</div>;
+}
