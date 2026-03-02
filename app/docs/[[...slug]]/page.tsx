@@ -45,6 +45,7 @@ export async function generateMetadata(
 	if (!page) notFound();
 
 	return {
+		metadataBase: new URL("https://ui.fifthwit.net"),
 		title: page.data.title,
 		description: page.data.description,
 		openGraph: {
