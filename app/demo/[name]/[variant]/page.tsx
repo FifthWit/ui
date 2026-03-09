@@ -10,6 +10,7 @@ import {
 	CollapsibleDevsDemo,
 	CollapsibleNotificiationsDemo,
 } from "@/registry/demos/collapsible";
+import { CodeGenerationDemo } from "@/registry/demos/code-generation";
 
 type DemoMap = Record<
 	string,
@@ -25,6 +26,7 @@ export const demos: DemoMap = {
 		devs: CollapsibleDevsDemo,
 		notifications: CollapsibleNotificiationsDemo,
 	},
+	"code-generation": { default: CodeGenerationDemo },
 };
 
 export default function DemoVariantPage() {
