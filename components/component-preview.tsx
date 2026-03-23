@@ -28,7 +28,7 @@ export function ComponentPreview({
 	return (
 		<div
 			className={cn(
-				"flex items-center justify-center p-10 border rounded-xl not-prose",
+				"flex items-center justify-center p-10 border rounded-xl not-prose isolate",
 				className,
 			)}
 		>
