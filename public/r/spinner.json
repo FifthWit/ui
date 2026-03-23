@@ -3,7 +3,9 @@
   "name": "spinner",
   "title": "Spinner",
   "description": "Animated loading indicator (spinner) components",
-  "dependencies": ["tw-animate-css"],
+  "dependencies": [
+    "tw-animate-css"
+  ],
   "files": [
     {
       "path": "registry/components/collapsible.tsx",
@@ -12,5 +14,20 @@
       "target": "components/collapsible.tsx"
     }
   ],
+  "css": {
+    "@theme": {
+      "--animate-angle-spin": "angle-spin var(--tw-duration, 1.1s) var(--tw-ease, linear) infinite",
+      "@keyframes angle-spin": {
+        "to": {
+          "--spinner-angle": "360deg"
+        }
+      }
+    },
+    "@property --spinner-angle": {
+      "syntax": "\"<angle>\"",
+      "initial-value": "0deg",
+      "inherits": "false"
+    }
+  },
   "type": "registry:component"
 }

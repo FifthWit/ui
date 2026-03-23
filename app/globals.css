@@ -145,13 +145,3 @@
   initial-value: 0deg;
   inherits: false;
 }
-/* 
-@theme {
-  --animate-angle-spin: angle-spin 10s linear infinite;
-
-  @keyframes angle-spin {
-    to {
-      --spinner-angle: 360deg;
-    }
-  }
-} */
