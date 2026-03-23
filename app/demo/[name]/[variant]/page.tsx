@@ -11,6 +11,7 @@ import {
 	CollapsibleNotificiationsDemo,
 } from "@/registry/demos/collapsible";
 import { CodeGenerationDemo } from "@/registry/demos/code-generation";
+import { SpinnerDemo, SpinnerOutlineDemo } from "@/registry/demos/spinner";
 
 type DemoMap = Record<
 	string,
@@ -27,6 +28,10 @@ export const demos: DemoMap = {
 		notifications: CollapsibleNotificiationsDemo,
 	},
 	"code-generation": { default: CodeGenerationDemo },
+	spinner: {
+		default: SpinnerDemo,
+		outline: SpinnerOutlineDemo,
+	},
 };
 
 export default function DemoVariantPage() {

@@ -29,8 +29,8 @@ function ComponentLink({
 				className="rounded-t-xl"
 			/>
 			<div className="p-2">
-				<h2 className="text-lg">{name}</h2>
-				<p className="text-muted-foreground">{description}</p>
+				<h2 className="text-lg text-card-foreground">{name}</h2>
+				<p className="text-muted-foreground text-sm">{description}</p>
 			</div>
 		</Link>
 	);
@@ -58,6 +58,11 @@ export function ComponentLibrary() {
 			name: "Stateful Badge",
 			description: "Badge that animates between states",
 			slug: "stateful-badge",
+		},
+		{
+			name: "Spinner",
+			description: "Variety of loading indicators for your needs",
+			slug: "spinner",
 		},
 	];
 

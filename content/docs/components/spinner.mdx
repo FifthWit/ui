@@ -1,0 +1,177 @@
+---
+title: "Spinner"
+description: "Animated loading indicators with customizable borders and gradients."
+---
+
+import { ComponentPreview } from '@/components/component-preview';
+
+<Tabs items={["Preview", "Code"]}>
+  <Tab><ComponentPreview name="spinner" variant="default" /></Tab>
+  <Tab>
+```tsx
+import React from "react";
+import { SpinnerRainbowBorder } from "@/components/spinner";
+
+export function SpinnerDemo() {
+	const [loading, setLoading] = React.useState<boolean>(true);
+
+	return (
+		<div className="flex flex-row gap-8">
+			<button
+				type="button"
+				className="cursor-pointer rounded-3xl bg-accent aspect-square w-21 hover:scale-104 active:scale-98 transition-all duration-150 active:bg-white/15"
+				onClick={() => setLoading(!loading)}
+			>
+				{loading ? "Stop" : "Start"}
+			</button>
+			<SpinnerRainbowBorder
+				loading={loading}
+				glow={true}
+				className="rounded-sm bg-card"
+			>
+				<h2>Super intelligent AI is thinking</h2>
+				<p>At least we think it is thinking</p>
+			</SpinnerRainbowBorder>
+		</div>
+	);
+}
+```
+  </Tab>
+</Tabs>
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'deno', 'bun']}>
+    <Tab>
+```bash
+npx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/spinner.json
+```
+    </Tab>
+    <Tab>
+```bash
+pnpm dlx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/spinner.json
+```
+    </Tab>
+    <Tab>
+```bash
+deno run -A npm:shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/spinner.json
+```
+    </Tab>
+    <Tab>
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/FifthWit/ui/refs/heads/main/public/r/spinner.json
+```
+    </Tab>
+</Tabs>
+
+## Anatomy
+
+```tsx
+import { SpinnerRainbowBorder, SpinnerOutline } from "@/components/spinner";
+
+export default () => (
+  <>
+    <SpinnerRainbowBorder loading={true}>
+      <div>Content...</div>
+    </SpinnerRainbowBorder>
+
+    <SpinnerOutline loading={true}>
+      <div>Content...</div>
+    </SpinnerOutline>
+  </>
+)
+```
+
+## Examples
+
+### Spinner Outline
+A smooth gradient outline variant where you can customize primary and background colors.
+
+<Tabs items={["Preview", "Code"]}>
+  <Tab><ComponentPreview name="spinner" variant="outline" /></Tab>
+  <Tab>
+```tsx
+import React from "react";
+import { SpinnerOutline } from "@/components/spinner";
+
+export function SpinnerOutlineDemo() {
+	const [loading, setLoading] = React.useState<boolean>(true);
+
+	return (
+		<div className="flex flex-row gap-4">
+			<button
+				type="button"
+				className="cursor-pointer rounded-3xl bg-accent aspect-square w-14 hover:scale-104 active:scale-98 transition-all duration-150 active:bg-white/15"
+				onClick={() => setLoading(!loading)}
+			>
+				{loading ? "Stop" : "Start"}
+			</button>
+			<SpinnerOutline loading={loading}>
+				<p className="">ClaudePilotGPT is thinking...</p>
+			</SpinnerOutline>
+		</div>
+	);
+}
+```
+  </Tab>
+</Tabs>
+
+## Props
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+### `<SpinnerRainbowBorder />`
+<TypeTable
+  type={{
+    loading: {
+      description: "Toggles the spinning animation and border visibility",
+      type: "boolean",
+      required: true
+    },
+    glow: {
+      description: "Enables the glowing blur effect on the border",
+      type: "boolean",
+      default: "true",
+    },
+    border: {
+      description: "Shows the spinning border",
+      type: "boolean",
+      default: "true"
+    },
+    className: {
+      description: "Additional CSS classes to apply to the container",
+      type: "string",
+      default: undefined
+    },
+    children: {
+      description: "The content wrapped by the spinner",
+      type: "React.ReactNode",
+      default: undefined
+    }
+  }}
+/>
+
+### `<SpinnerOutline />`
+<TypeTable 
+  type={{
+    loading: {
+      description: "Toggles the spinning outline animation",
+      type: "boolean",
+      required: true
+    },
+    styling: {
+      description: "Custom CSS properties for the outline gradient",
+      type: "{ primary?: string; background?: string; length?: string }",
+      default: '{ primary: "var(--primary)", background: "var(--background)", length: "85%" }'
+    },
+    className: {
+      description: "Additional CSS classes to apply to the container",
+      type: "string",
+      default: undefined
+    },
+    children: {
+      description: "The content wrapped by the spinner",
+      type: "React.ReactNode",
+      default: undefined
+    }
+  }} 
+/>
