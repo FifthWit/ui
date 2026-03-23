@@ -62,6 +62,13 @@
           "target": "components/collapsible.tsx"
         }
       ]
+    },
+    {
+      "name": "spinner",
+      "type": "registry:component",
+      "title": "Spinner",
+      "description": "Animated loading indicator (spinner) components",
+      "dependencies": ["tw-animate-css"]
     }
   ]
 }

@@ -48,6 +48,15 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  --animate-angle-spin: angle-spin var(--tw-duration, 1.1s)
+    var(--tw-ease, linear) infinite;
+
+  @keyframes angle-spin {
+    to {
+      --spinner-angle: 360deg;
+    }
+  }
 }
 
 :root {
@@ -130,3 +139,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+@property --spinner-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+/* 
+@theme {
+  --animate-angle-spin: angle-spin 10s linear infinite;
+
+  @keyframes angle-spin {
+    to {
+      --spinner-angle: 360deg;
+    }
+  }
+} */

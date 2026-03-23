@@ -1,0 +1,10 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spinner",
+  "title": "Spinner",
+  "description": "Animated loading indicator (spinner) components",
+  "dependencies": [
+    "tw-animate-css"
+  ],
+  "type": "registry:component"
+}
