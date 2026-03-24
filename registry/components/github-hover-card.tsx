@@ -28,6 +28,7 @@ const GhCardRoot = forwardRef<HTMLElement, GhCardRootProps>(
 		return (
 			<GhCardContext.Provider value={{ isHovered, setIsHovered }}>
 				<Component
+					role="link"
 					onMouseEnter={() => {
 						setIsHovered(true);
 					}}
@@ -36,8 +37,7 @@ const GhCardRoot = forwardRef<HTMLElement, GhCardRootProps>(
 					}}
 					ref={ref}
 					className={cn(
-						"relative overflow-hidden px-12 pt-8 h-116 w-106 flex flex-col justify-between border-2",
-						isHovered ? "border-muted-foreground/30" : "",
+						"group relative overflow-hidden px-12 pt-8 sm:w-sm lg:w-lg w-2xs aspect-4/5 flex flex-col justify-between border-2 bg-background hover:border-muted-foreground/30 transition-colors duration-300 ease-out",
 						className,
 					)}
 					{...props}
@@ -74,17 +74,20 @@ const GhCardContent = forwardRef<
 GhCardContent.displayName = "GhCardContent";
 
 const GhCardTitle = forwardRef<
-	HTMLDivElement,
-	React.HTMLAttributes<HTMLElement>
+	HTMLHeadingElement,
+	React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, children, ...props }, ref) => {
 	return (
-		<div
-			className={cn("text-foreground text-3xl font-bold z-10", className)}
+		<h2
+			className={cn(
+				"text-foreground text-3xl font-bold z-10 group-hover:not-dark:text-white/90 transition-colors duration-300 ease-out",
+				className,
+			)}
 			ref={ref}
 			{...props}
 		>
 			{children}
-		</div>
+		</h2>
 	);
 });
 
@@ -123,34 +126,40 @@ const GhCardImage = forwardRef<HTMLImageElement, GhCardImageProps>(
 GhCardImage.displayName = "GhCardImage";
 
 const GhCardLabel = forwardRef<
-	HTMLSpanElement,
-	React.HTMLAttributes<HTMLSpanElement>
+	HTMLParagraphElement,
+	React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
 	return (
-		<span
+		<p
 			ref={ref}
-			className={cn("text-foreground/40 text-lg font-semibold z-10", className)}
+			className={cn(
+				"text-muted-foreground group-hover:not-dark:text-white/45 dark:text-foreground/50 text-sm md:text-lg font-semibold z-10 transition-colors duration-300 ease-out",
+				className,
+			)}
 			{...props}
 		>
 			{children}
-		</span>
+		</p>
 	);
 });
 
 GhCardLabel.displayName = "GhCardLabel";
 
 const GhCardHeader = forwardRef<
-	HTMLSpanElement,
-	React.HTMLAttributes<HTMLSpanElement>
+	HTMLHeadingElement,
+	React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, children, ...props }, ref) => {
 	return (
-		<span
+		<h3
 			ref={ref}
-			className={cn("text-foreground text-xl z-10 font-semibold", className)}
+			className={cn(
+				"text-foreground group-hover:not-dark:text-white/90 text-md md:text-xl z-10 font-semibold transition-colors duration-300 ease-out",
+				className,
+			)}
 			{...props}
 		>
 			{children}
-		</span>
+		</h3>
 	);
 });
 
@@ -165,7 +174,7 @@ const GhCardSubHeader = forwardRef<
 		<span
 			ref={ref}
 			className={cn(
-				"text-base text-[#79c0ff] z-10 transition-all duration-200 ease-out font-mono",
+				"text-sm md:text-base text-[#a8d6ff] dark:text-[#79c0ff] z-10 transition-all duration-200 ease-out font-mono",
 				isHovered ? "opacity-100 translate-y-0" : "opacity-0",
 				className,
 			)}
