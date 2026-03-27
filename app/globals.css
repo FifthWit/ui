@@ -145,3 +145,10 @@
   initial-value: 0deg;
   inherits: false;
 }
+
+@custom-variant safari {
+  @supports (hanging-punctuation: first) and (font: -apple-system-body) and
+    (-webkit-appearance: none) {
+    @slot;
+  }
+}
