@@ -12,6 +12,8 @@ import {
 } from "@/registry/demos/collapsible";
 import { CodeGenerationDemo } from "@/registry/demos/code-generation";
 import { SpinnerDemo, SpinnerOutlineDemo } from "@/registry/demos/spinner";
+import { Switch } from "@/registry/components/switch";
+import { SwitchDefaultDemo } from "@/registry/demos/switch";
 
 type DemoMap = Record<
 	string,
@@ -32,6 +34,9 @@ export const demos: DemoMap = {
 		default: SpinnerDemo,
 		outline: SpinnerOutlineDemo,
 	},
+	switch: {
+		default: SwitchDefaultDemo
+	}
 };
 
 export default function DemoVariantPage() {
